@@ -71,7 +71,7 @@
       });
 
       it('should prevent closing the overlay when preventing vaadin-overlay-cancel', done => {
-        overlay.addEventListener('vaadin-overlay-cancel', e => {
+        overlay.addEventListener('vaadin-overlay-close', e => {
           e.preventDefault();
 
           setTimeout(() => {

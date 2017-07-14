@@ -56,7 +56,7 @@ This program is available under Apache License Version 2.0, available at https:/
     <div
       id="backdrop"
       part="backdrop"
-      on-tap="_cancel"
+      on-tap="close"
       hidden$="{{!withBackdrop}}">
     </div>
     <div part="content" id="content">
@@ -129,27 +129,30 @@ This program is available under Apache License Version 2.0, available at https:/
       }
 
       /**
+       * Close the overlay and fire `vaadin-overlay-close` event
+       */
+      close(sourceEvent) {
+        var evt = new CustomEvent('vaadin-overlay-close', {bubbles: true, cancelable: true, detail: {sourceEvent: sourceEvent}});
+        this.dispatchEvent(evt);
+        if (!evt.defaultPrevented) {
+          this.opened = false;
+        }
+      }
+
+      /**
        * We need to listen on 'click' / 'tap' event and capture it and close the overlay before
        * propagating the event to the listener in the button. Otherwise, if the clicked button would call
        * open(), this would happen: https://www.youtube.com/watch?v=Z86V_ICUCD4
        */
       _outsideClickListener(event) {
         if (this.opened && event.composedPath().indexOf(this) < 0) {
-          this._cancel(event);
+          this.close(event);
         }
       }
 
       _escapeListener(event) {
         if (this.opened && event.keyCode === 27) {
-          this._cancel(event);
-        }
-      }
-
-      _cancel(sourceEvent) {
-        var evt = new CustomEvent('vaadin-overlay-cancel', {bubbles: true, cancelable: true, detail: {sourceEvent: sourceEvent}});
-        this.dispatchEvent(evt);
-        if (!evt.defaultPrevented) {
-          this.opened = false;
+          this.close(event);
         }
       }
 
