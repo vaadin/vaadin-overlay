@@ -87,6 +87,17 @@
         expect(overlay.opened).to.be.true;
       });
 
+      it('should fire the vaadin-overlay-tab-press event only when TAB pressed', function(done) {
+        var doneHandler = () => done();
+
+        overlay.addEventListener('vaadin-overlay-tab-press', doneHandler, false);
+
+        MockInteractions.pressAndReleaseKeyOn(document.body, 9);
+        MockInteractions.pressAndReleaseKeyOn(document.body, 13);
+
+        overlay.removeEventListener('vaadin-overlay-tab-press', doneHandler, false);
+      });
+
       it('should not close on inside click', () => {
         content.click();
 
