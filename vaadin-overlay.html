@@ -146,6 +146,8 @@ This program is available under Apache License Version 2.0, available at https:/
         super.ready();
 
         this._observer.flush();
+        this.addEventListener('mousedown', e => this._mouseDownInside = e.composedPath().indexOf(this.$.content) >= 0);
+        this.addEventListener('mouseup', e => this._mouseUpInside = e.composedPath().indexOf(this.$.content) >= 0);
       }
 
       _setTemplateFromNodes(nodes) {
@@ -197,7 +199,7 @@ This program is available under Apache License Version 2.0, available at https:/
        * fired before the `vaadin-overlay` will be closed on outside click. If canceled the closing of the overlay is canceled as well.
        */
       _outsideClickListener(event) {
-        if (event.composedPath().indexOf(this.$.content) >= 0) {
+        if (this._mouseDownInside || this._mouseUpInside) {
           return;
         }
 
