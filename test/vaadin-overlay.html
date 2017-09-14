@@ -50,6 +50,11 @@
         overlay.opened = true;
       });
 
+      afterEach(function() {
+        // Avoid stacking up <vaadin-overlay> elements in the body.
+        overlay.opened = false;
+      });
+
       it('should move under body when open', () => {
         expect(overlay.parentElement).to.eql(document.body);
       });
@@ -233,6 +238,61 @@
           }, 1);
         });
         click(parent);
+      });
+
+      it('should allow pointer events on the content while skipping on the host', () => {
+        expect(window.getComputedStyle(content).pointerEvents).to.equal('auto');
+        expect(window.getComputedStyle(overlay).pointerEvents).to.equal('none');
+      });
+
+      describe('position and sizing', () => {
+        it('should fit in the viewport by default', () => {
+          const rect = overlay.getBoundingClientRect();
+          expect(rect.left).to.be.gte(0);
+          expect(rect.top).to.be.gte(0);
+          expect(rect.right).to.be.lte(document.documentElement.clientWidth);
+          expect(rect.bottom).to.be.lte(document.documentElement.clientHeight);
+        });
+
+        it('should fit in viewport when huge content is used', () => {
+          content.lastElementChild.style = 'display: block; width: 2000px; height: 2000px;';
+
+          const rect = overlay.getBoundingClientRect();
+          expect(rect.left).to.be.gte(0);
+          expect(rect.top).to.be.gte(0);
+          expect(rect.right).to.be.lte(document.documentElement.clientWidth);
+          expect(rect.bottom).to.be.lte(document.documentElement.clientHeight);
+        });
+
+        it('should fit content in overlay', () => {
+          const overlayRect = overlay.getBoundingClientRect();
+          const contentRect = content.getBoundingClientRect();
+
+          expect(contentRect.left).to.be.gte(overlayRect.left);
+          expect(contentRect.top).to.be.gte(overlayRect.top);
+          expect(contentRect.right).to.be.lte(overlayRect.right);
+          expect(contentRect.bottom).to.be.lte(overlayRect.bottom);
+        });
+
+        it('should center content in overlay with flex by default', () => {
+          // The “default” fixture content is too large to test this
+          content.textContent = 'foo';
+
+          const overlayRect = overlay.getBoundingClientRect();
+          const contentRect = content.getBoundingClientRect();
+
+          const halfWidthDifference = (overlayRect.width - contentRect.width) / 2;
+          const halfHeightDifference = (overlayRect.height - contentRect.height) / 2;
+
+          // Should not stretch the content in the overlay
+          expect(halfWidthDifference).to.be.gte(0);
+          expect(halfHeightDifference).to.be.gte(0);
+
+          expect(contentRect.left - overlayRect.left).to.be.closeTo(halfWidthDifference, 1);
+          expect(overlayRect.right - contentRect.right).to.be.closeTo(halfWidthDifference, 1);
+          expect(contentRect.top - overlayRect.top).to.be.closeTo(halfHeightDifference, 1);
+          expect(overlayRect.bottom - contentRect.bottom).to.be.closeTo(halfHeightDifference, 1);
+        });
       });
     });
   </script>

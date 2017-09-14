@@ -12,10 +12,17 @@ This program is available under Apache License Version 2.0, available at https:/
 <dom-module id="vaadin-overlay-default-theme">
   <template>
     <style>
+      :host {
+        /* Make nice gaps inside viewport */
+        top: 8px;
+        right: 8px;
+        left: 8px;
+        bottom: 8px;
+      }
+
       [part="content"] {
         background: #fff;
-        -webkit-overflow-scrolling: touch;
-        overflow: auto;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
       }
     </style>
   </template>
@@ -27,10 +34,30 @@ This program is available under Apache License Version 2.0, available at https:/
       :host {
         z-index: 200;
         position: fixed;
+
+        /*
+          Despite of what the names say, <vaadin-overlay> is just a container
+          for position/sizing/alignment. The actual overlay is the content part.
+        */
+
+        /*
+          Default position constraints: the entire viewport. Note: themes can
+          override this to introduce gaps between the overlay and the viewport.
+        */
         top: 0;
+        right: 0;
+        bottom: 0;
         left: 0;
-        pointer-events: auto;
-        overflow: hidden;
+
+        /* Use flexbox alignment for the content part. */
+        display: flex;
+        flex-direction: column; /* makes dropdowns sizing easier */
+        /* Align to center by default. */
+        align-items: center;
+        justify-content: center;
+
+        /* The host is not clickable, only the content is. */
+        pointer-events: none;
       }
 
       :host(:not([opened])) {
@@ -38,7 +65,10 @@ This program is available under Apache License Version 2.0, available at https:/
       }
 
       [part="content"] {
-        max-height: 100%;
+        -webkit-overflow-scrolling: touch;
+        overflow: auto;
+        pointer-events: auto;
+        direction: ltr;
       }
 
       [part="backdrop"] {
@@ -50,6 +80,7 @@ This program is available under Apache License Version 2.0, available at https:/
         left: 0;
         bottom: 0;
         right: 0;
+        pointer-events: auto;
       }
     </style>
 
@@ -112,14 +143,6 @@ This program is available under Apache License Version 2.0, available at https:/
             type: Object
           },
 
-          _mouseDownInside: {
-            type: Boolean
-          },
-
-          _mouseUpInside: {
-            type: Boolean
-          },
-
           _instance: {
             type: Object
           },
@@ -154,9 +177,6 @@ This program is available under Apache License Version 2.0, available at https:/
         super.ready();
 
         this._observer.flush();
-
-        this.addEventListener('mousedown', e => this._mouseDownInside = e.composedPath().indexOf(this.$.content) >= 0);
-        this.addEventListener('mouseup', e => this._mouseUpInside = e.composedPath().indexOf(this.$.content) >= 0);
       }
 
       _setTemplateFromNodes(nodes) {
@@ -208,7 +228,8 @@ This program is available under Apache License Version 2.0, available at https:/
        * fired before the `vaadin-overlay` will be closed on outside click. If canceled the closing of the overlay is canceled as well.
        */
       _outsideClickListener(event) {
-        if (this._mouseDownInside || this._mouseUpInside) {
+        if (event.composedPath().indexOf(this.$.content) !== -1) {
+          // Inside click, do nothing.
           return;
         }
 
