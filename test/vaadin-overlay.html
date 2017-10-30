@@ -14,7 +14,7 @@
     <template>
       <div>
         <div id="parent">
-          <vaadin-overlay>
+          <vaadin-overlay modal>
             <template>
               content
               <button>native button</button>
@@ -74,8 +74,18 @@
         expect(overlay.parentElement).to.eql(document.body);
       });
 
-      it('should prevent clicking elements outside overlay', () => {
+      it('should not prevent clicking elements outside overlay when nonmodal', () => {
+        overlay.nonModal = true;
+        expect(document.body.style.pointerEvents).to.eql('');
+      });
+
+      it('should prevent clicking elements outside overlay when modal', () => {
         expect(document.body.style.pointerEvents).to.eql('none');
+      });
+
+      it('should not prevent clicking document elements after modal is closed', () => {
+        overlay.opened = false;
+        expect(document.body.style.pointerEvents).to.eql('');
       });
 
       it('should move back to original place after closing', () => {

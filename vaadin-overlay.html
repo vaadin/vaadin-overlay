@@ -152,6 +152,12 @@ This program is available under Apache License Version 2.0, available at https:/
             reflectToAttribute: true
           },
 
+          nonModal: {
+            type: Boolean,
+            value: false,
+            reflectToAttribute: true,
+            observer: '_nonModalChanged'
+          },
 
           /**
            * When true move focus to the first focusable element in the overlay,
@@ -333,37 +339,55 @@ This program is available under Apache License Version 2.0, available at https:/
           this.parentNode.insertBefore(this._placeholder, this);
           document.body.appendChild(this);
 
+          Polymer.Async.idlePeriod.run(() => {
+            if (this.focusTrap) {
+              // Focus
+              //  - the overlay content by default
+              //  - or the first focusable element if focusTrap is true
+              this._setFocus(-1, 1);
+            }
+
+            const evt = new CustomEvent('vaadin-overlay-open', {bubbles: true});
+            this.dispatchEvent(evt);
+          });
+
+        } else {
+          if (this._placeholder) {
+            this._placeholder.parentNode.insertBefore(this, this._placeholder);
+            this._processPendingMutationObserversFor(document.body);
+            this._placeholder.parentNode.removeChild(this._placeholder);
+          }
+          this._resetPreviousState();
+        }
+      }
+
+      _nonModalChanged(nonModal) {
+        if (!nonModal) {
           document.addEventListener('mousedown', this._boundMouseDownListener);
           document.addEventListener('mouseup', this._boundMouseUpListener);
           document.addEventListener('click', this._boundOutsideClickListener, true);
           document.addEventListener('keydown', this._boundKeydownListener);
 
           // Set body pointer-events to 'none' to disable mouse interactions with
-          // other document nodes (combo-box is "modal")
+          // other document nodes
           this._previousDocumentPointerEvents = document.body.style.pointerEvents;
           document.body.style.pointerEvents = 'none';
 
-          Polymer.Async.idlePeriod.run(() => {
-            // Focus
-            //  - the overlay content by default
-            //  - or the first focusable element if focusTrap is true
-            this._setFocus(-1, 1);
+        } else {
+          this._resetPreviousState();
+        }
+      }
 
-            const evt = new CustomEvent('vaadin-overlay-open', {bubbles: true});
-            this.dispatchEvent(evt);
-          });
+      _resetPreviousState() {
+        document.removeEventListener('mousedown', this._boundMouseDownListener);
+        document.removeEventListener('mouseup', this._boundMouseUpListener);
+        document.removeEventListener('click', this._boundOutsideClickListener, true);
+        document.removeEventListener('keydown', this._boundKeydownListener);
 
-        } else if (this._placeholder) {
-          document.removeEventListener('mousedown', this._boundMouseDownListener);
-          document.removeEventListener('mouseup', this._boundMouseUpListener);
-          document.removeEventListener('click', this._boundOutsideClickListener, true);
-          document.removeEventListener('keydown', this._boundKeydownListener);
-
-          this._placeholder.parentNode.insertBefore(this, this._placeholder);
-          this._processPendingMutationObserversFor(document.body);
-          this._placeholder.parentNode.removeChild(this._placeholder);
-
+        // Restore body pointer-events
+        if (this._previousDocumentPointerEvents !== null) {
           document.body.style.pointerEvents = this._previousDocumentPointerEvents;
+          this._previousDocumentPointerEvents = null;
         }
       }
 
