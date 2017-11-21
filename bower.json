@@ -25,7 +25,8 @@
   ],
   "dependencies": {
     "polymer": "^2.0.0",
-    "vaadin-themable-mixin": "^1.1.1"
+    "vaadin-themable-mixin": "^1.1.1",
+    "vaadin-valo-theme": "vaadin/vaadin-valo-theme#master"
   },
   "devDependencies": {
     "elements-demo-resources": "^2.0.0",
