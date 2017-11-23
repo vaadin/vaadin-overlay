@@ -50,6 +50,7 @@
     const click = (el) => fire('click', el);
     const mousedown = (el) => fire('mousedown', el);
     const mouseup = (el) => fire('mouseup', el);
+    const ie = /MSIE/.test(navigator.userAgent);
 
     describe('overlay', function() {
       var overlay, parent, overlayPart, content, backdrop, focusableElements;
@@ -70,7 +71,7 @@
         overlay.opened = false;
       });
 
-      it('should set value to --vaadin-overlay-viewport-bottom when landscape and clientHeight > innerHeight', () => {
+      !ie && it('should set value to --vaadin-overlay-viewport-bottom when landscape and clientHeight > innerHeight', () => {
         window.top.document.querySelector('#subsuites').style.height = '250px';
         const sandbox = sinon.sandbox.create();
         sandbox.stub(window, 'innerHeight', 200);
