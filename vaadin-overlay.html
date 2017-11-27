@@ -96,13 +96,23 @@ This program is available under Apache License Version 2.0, available at https:/
         right: 0;
         pointer-events: auto;
       }
+
+      #first-focus-mark,
+      #last-focus-mark {
+        position: absolute;
+        width: 0;
+        height: 0;
+        opacity: 0;
+      }
     </style>
 
     <div id="backdrop" part="backdrop" hidden$="{{!withBackdrop}}">
 
     </div>
     <div part="overlay" id="overlay">
+      <input id="first-focus-mark">
       <div part="content" id="content"></div>
+      <input id="last-focus-mark">
     </div>
   </template>
 </dom-module>
@@ -236,6 +246,14 @@ This program is available under Apache License Version 2.0, available at https:/
       ready() {
         super.ready();
 
+        // When focus reaches hidden marks we move focus to the appropriate focusable element
+        this.$['first-focus-mark'].addEventListener('focus', e => {
+          setTimeout(() => this._lastFocusable && this._lastFocusable.focus());
+        });
+        this.$['last-focus-mark'].addEventListener('focus', e => {
+          setTimeout(() => this._firstFocusable && this._firstFocusable.focus());
+        });
+
         this._observer.flush();
 
         // Need to add dummy click listeners to this and the backdrop or else
@@ -356,24 +374,9 @@ This program is available under Apache License Version 2.0, available at https:/
           return;
         }
 
-        // TAB
-        if (event.key === 'Tab' && this.focusTrap) {
-          const focusableElements = this._getFocusableElements();
-          const focusedElementIndex = focusableElements.indexOf(this._focusedElement);
+        this._shiftKey = event.shiftKey;
 
-          // Cycle to the next button
-          if (!event.shiftKey) {
-            this._setFocus(focusedElementIndex, 1);
-
-          // Cycle to the prev button
-          } else {
-            this._setFocus(focusedElementIndex, -1);
-          }
-
-          event.preventDefault();
-
-        // ESC
-        } else if (event.key === 'Escape' || event.key === 'Esc') {
+        if (event.key === 'Escape' || event.key === 'Esc') {
           const evt = new CustomEvent('vaadin-overlay-escape-press', {bubbles: true, cancelable: true, detail: {sourceEvent: event}});
           this.dispatchEvent(evt);
 
@@ -381,6 +384,32 @@ This program is available under Apache License Version 2.0, available at https:/
             this.close(event);
           }
         }
+      }
+
+      // Returns the first focusable element inside another element.
+      // if reverse is true it returns the last element instead.
+      // It considers tabindex order and deeps into shadowRoot
+      _getFirstFocusable(element, reverse) {
+        let arr = Array.from(element.querySelectorAll('*'));
+        reverse && (arr = arr.reverse());
+
+        const noValue = reverse ? -1 : Infinity;
+        const compare = (a, b) => {
+          return reverse ? a > b : a < b;
+        };
+        const tabindex = e => {
+          const i = e.disabled ? -1 : parseInt(e.getAttribute('tabindex') || e.tabIndex);
+          return i === 0 ? Number.MAX_VALUE : i < 0 ? noValue : i;
+        };
+
+        return arr.reduce((last, e) => {
+          const i = tabindex(e, noValue);
+          // If the element is not focusable, look into shadowRoot
+          const curr = last.tabindex == noValue && i == noValue && e.shadowRoot
+            ? this._getFirstFocusable(e.shadowRoot, reverse)
+            : {element: e, tabindex: i};
+          return compare(curr.tabindex, last.tabindex) ? curr : last;
+        }, {element: null, tabindex: noValue});
       }
 
       /**
@@ -394,12 +423,11 @@ This program is available under Apache License Version 2.0, available at https:/
           document.body.appendChild(this);
 
           Polymer.RenderStatus.afterNextRender(this, () => {
-            if (this.focusTrap) {
-              // Focus
-              //  - the overlay content by default
-              //  - or the first focusable element if focusTrap is true
-              this._setFocus(-1, 1);
-            }
+            this._firstFocusable = this.focusTrap && this._getFirstFocusable(this.$.content, false).element || this.$.content;
+            this._lastFocusable = this.focusTrap && this._getFirstFocusable(this.$.content, true).element || this.$.content;
+
+            // Focuses the _firstFocusable if focusTrap is set, otherwise the content wrapper
+            this._firstFocusable.focus();
 
             const evt = new CustomEvent('vaadin-overlay-open', {bubbles: true});
             this.dispatchEvent(evt);
@@ -479,68 +507,9 @@ This program is available under Apache License Version 2.0, available at https:/
         this.$.content.appendChild(content);
       }
 
-      _setFocus(index, increment) {
-        if (!this.focusTrap) {
-          return;
-        }
-
-        const focusableElements = this._getFocusableElements();
-
-        // search for visible elements and select the next possible match
-        for (let i = 0; i < focusableElements.length; i++) {
-          index = index + increment;
-
-          // rollover to first item
-          if (index === focusableElements.length) {
-            index = 0;
-
-          // go to last item
-          } else if (index === -1) {
-            index = focusableElements.length - 1;
-          }
-
-          // determine if element is visible
-          const el = focusableElements[index];
-          if (this._isVisible(el)) {
-            this._focusedElement = el;
-            return el.focus();
-          }
-        }
-
-        // fallback if there are no focusable elements
-        this._focusedElement = this.$.overlay;
-        this.$.overlay.focus();
-      }
-
       // borrowed from jqeury $(elem).is(':visible') implementation
       _isVisible(elem) {
         return elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length;
-      }
-
-      _getFocusableElements() {
-        // collect all focusable elements
-        const focusableElements = Array.from(this.$.content.querySelectorAll(
-          '[tabindex], button, input, select, textarea, object, iframe, label, a[href], area[href]'
-        )).filter((el) => {
-          return el.getAttribute('tabindex') !== '-1';
-        });
-
-        // sort focusable elements according to tabindex
-        return focusableElements.sort((a, b) => {
-          a = parseInt(a.getAttribute('tabindex')) || 0;
-          b = parseInt(b.getAttribute('tabindex')) || 0;
-          if (a === b) {
-            return 0;
-          } else if (a === 0) {
-            return 1;
-          } else if (b === 0) {
-            return -1;
-          } else if (a < b) {
-            return -1;
-          } else if (a > b) {
-            return 1;
-          }
-        });
       }
 
       _processPendingMutationObserversFor(node) {
