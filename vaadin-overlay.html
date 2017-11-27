@@ -195,10 +195,6 @@ This program is available under Apache License Version 2.0, available at https:/
             value: false
           },
 
-          _focusedElement: {
-            type: Object
-          },
-
           _mouseDownInside: {
             type: Boolean
           },
@@ -398,7 +394,8 @@ This program is available under Apache License Version 2.0, available at https:/
           return reverse ? a > b : a < b;
         };
         const tabindex = e => {
-          const i = e.disabled ? -1 : parseInt(e.getAttribute('tabindex') || e.tabIndex);
+          const i = e.disabled || !(e.offsetWidth || e.offsetHeight || e.getClientRects().length)
+            ? -1 : parseInt(e.getAttribute('tabindex') || e.tabIndex);
           return i === 0 ? Number.MAX_VALUE : i < 0 ? noValue : i;
         };
 
