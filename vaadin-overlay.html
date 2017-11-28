@@ -103,6 +103,11 @@ This program is available under Apache License Version 2.0, available at https:/
         height: 0;
         opacity: 0;
       }
+
+      :host(:not([focus-trap])) #first-focus-mark,
+      :host(:not([focus-trap])) #last-focus-mark {
+        display: none;
+      }
     </style>
 
     <div id="backdrop" part="backdrop" hidden$="{{!withBackdrop}}">
@@ -191,7 +196,8 @@ This program is available under Apache License Version 2.0, available at https:/
            */
           focusTrap: {
             type: Boolean,
-            value: false
+            value: false,
+            reflectToAttribute: true
           },
 
           _mouseDownInside: {
@@ -419,11 +425,12 @@ This program is available under Apache License Version 2.0, available at https:/
           document.body.appendChild(this);
 
           Polymer.Async.idlePeriod.run(() => {
-            this._firstFocusable = this.focusTrap && this._getFirstFocusable(this.$.content, false).element || this.$.content;
-            this._lastFocusable = this.focusTrap && this._getFirstFocusable(this.$.content, true).element || this.$.content;
-
-            // Focuses the _firstFocusable if focusTrap is set, otherwise the content wrapper
-            this._firstFocusable.focus();
+            if (this.focusTrap) {
+              this._firstFocusable = this._getFirstFocusable(this.$.content, false).element || this.$.content;
+              this._lastFocusable = this._getFirstFocusable(this.$.content, true).element || this.$.content;
+              // Focuses the _firstFocusable if there is one, otherwise the content wrapper
+              this._firstFocusable.focus();
+            }
 
             const evt = new CustomEvent('vaadin-overlay-open', {bubbles: true});
             this.dispatchEvent(evt);
