@@ -387,9 +387,9 @@ This program is available under Apache License Version 2.0, available at https:/
         }
       }
 
-      // Returns the first focusable element inside another element.
-      // if reverse is true it returns the last element instead.
-      // It considers tabindex order and deeps into shadowRoot
+      // Returns the first focusable element inside another element, or
+      // the last one when reverse is true.
+      // It considers tabindex order and deeps into shadowRoot.
       _getFirstFocusable(element, reverse) {
         let arr = Array.from(element.querySelectorAll('*'));
         reverse && (arr = arr.reverse());
@@ -399,8 +399,12 @@ This program is available under Apache License Version 2.0, available at https:/
           return reverse ? a > b : a < b;
         };
         const tabindex = e => {
-          const i = e.disabled || !(e.offsetWidth || e.offsetHeight || e.getClientRects().length)
-            ? -1 : parseInt(e.getAttribute('tabindex') || e.tabIndex);
+          let i = e.disabled || !(e.offsetWidth || e.offsetHeight || e.getClientRects().length)
+            ? NaN : parseInt(e.getAttribute('tabindex'));
+          // We could use `element.tabIndex` which returns -1 when the element is not focusable, and 0
+          // when the element is natively focusable. Therefore, IE and Edge returns zero for both,
+          // thus we need to check tag-names
+          i = !isNaN(i) ? i : /^(button|input|select|textarea|object|iframe|a|area)$/i.test(e.localName) ? 0 : -1;
           return i === 0 ? Number.MAX_VALUE : i < 0 ? noValue : i;
         };
 
