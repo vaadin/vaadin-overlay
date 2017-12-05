@@ -10,6 +10,29 @@
 </head>
 
 <body>
+
+  <dom-module id="my-test-element">
+    <template>
+      <button id="elem1">[0] button</button>
+      <button id="elem2" tabindex="-1">[-1] button</button>
+      <select id="elem3" tabindex="2"><option>[2] option</option></select>
+      <textarea id="elem4" tabindex="1">[1] textarea</textarea>
+      <input id="elem5" type="text" value="[0]" />
+      <vaadin-button id="elem6">[0] vaadin-button</vaadin-button>
+    </template>
+
+    <script>
+      window.addEventListener('WebComponentsReady', () => {
+        class MyTestElement extends Polymer.Element {
+          static get is() {
+            return 'my-test-element';
+          }
+        }
+
+        window.customElements.define(MyTestElement.is, MyTestElement);
+      });
+    </script>
+  </dom-module>
   <test-fixture id="default">
     <template>
       <div>
@@ -17,12 +40,7 @@
           <vaadin-overlay>
             <template>
               content
-              <button>native button</button>
-              <button tabindex="-1">button with tabindex="-1"</button>
-              <select tabindex="2"></select>
-              <textarea tabindex="1"></textarea>
-              <input type="text">
-              <vaadin-button>vaadin-button</vaadin-button>
+              <my-test-element id='testelement'></my-test-element>
             </template>
           </vaadin-overlay>
         </div>
@@ -52,17 +70,17 @@
     const mouseup = (el) => fire('mouseup', el);
 
     describe('overlay', function() {
-      var overlay, parent, overlayPart, content, backdrop, focusableElements;
+      var overlay, parent, overlayPart, backdrop, content;
 
-      beforeEach(function() {
+      beforeEach(done => {
         parent = fixture('default').children[0];
         overlay = parent.children[0];
         overlayPart = overlay.$.overlay;
         content = overlay.$.content;
-        focusableElements = overlay._getFocusableElements();
         backdrop = overlay.$.backdrop;
         overlay._observer.flush();
         overlay.opened = true;
+        Polymer.RenderStatus.afterNextRender(this, () => done());
       });
 
       afterEach(function() {
@@ -90,7 +108,6 @@
 
       it('should move back to original place after closing', () => {
         overlay.opened = false;
-
         expect(overlay.parentElement).to.eql(parent);
       });
 
@@ -99,139 +116,104 @@
       });
 
       describe('focus trap', function() {
-        beforeEach(function() {
-          window.focus();
+        it('should not define first and last focusables when focusTrap == false', () => {
+          expect(overlay._firstFocusable).not.to.be.ok;
+          expect(overlay._firstFocusable).not.to.be.ok;
         });
 
-        it('should not focus the content when focusTrap = false', (done) => {
+        it('should define first and last focusable when focusTrap == true', done => {
           overlay.addEventListener('vaadin-overlay-open', () => {
-            expect(overlay._focusedElement).not.to.be.ok;
+            const testelement = content.firstElementChild;
+            expect(overlay._firstFocusable).to.be.equal(testelement.$.elem4);
+            expect(overlay._lastFocusable).to.be.equal(testelement.$.elem6);
             done();
           });
+
+          overlay.opened = false;
+          overlay.focusTrap = true;
+          overlay.opened = true;
+        });
+      });
+
+      describe('multiple overlays', function() {
+        let overlay1, overlay2;
+
+        beforeEach(() => {
+          overlay1 = overlay;
+          overlay2 = fixture('empty').children[0].children[0];
         });
 
-        it('should properly detect focusable elements inside the content', () => {
-          overlay.focusTrap = true;
-          expect(focusableElements.length).to.eql(5);
-          expect(focusableElements[0]).to.eql(overlay.$.content.querySelector('textarea'));
-          expect(focusableElements[1]).to.eql(overlay.$.content.querySelector('select'));
-          expect(focusableElements[2]).to.eql(overlay.$.content.querySelector('button'));
-          expect(focusableElements[3]).to.eql(overlay.$.content.querySelector('input'));
-          expect(focusableElements[4]).to.eql(overlay.$.content.querySelector('vaadin-button'));
-        });
+        afterEach(() => overlay2.opened = false);
 
-        it('should focus focusable elements inside the content when focusTrap = true', (done) => {
-          overlay.focusTrap = true;
-          overlay.addEventListener('vaadin-overlay-open', () => {
-            // TAB
-            for (let i = 0; i < focusableElements.length; i++) {
-              expect(overlay._focusedElement).to.eql(focusableElements[i]);
-              MockInteractions.pressAndReleaseKeyOn(document.body, 9, [], 'Tab');
-            }
-            expect(overlay._focusedElement).to.eql(focusableElements[0]);
-
-            // SHIFT+TAB
-            MockInteractions.pressAndReleaseKeyOn(document.body, 9, 'shift', 'Tab');
-            for (let i = focusableElements.length - 1; i >= 0; i--) {
-              expect(overlay._focusedElement).to.eql(focusableElements[i]);
-              MockInteractions.pressAndReleaseKeyOn(document.body, 9, 'shift', 'Tab');
-            }
-            expect(overlay._focusedElement).to.eql(focusableElements[focusableElements.length - 1]);
+        it('should focus the content of the second overlay because does not have any focusable element', done => {
+          overlay2.addEventListener('vaadin-overlay-open', () => {
+            expect(overlay2._firstFocusable).to.eql(overlay2.$.content);
             done();
           });
+
+          overlay2.opened = true;
         });
 
-        describe('empty content', function() {
-          beforeEach(function() {
-            overlay.opened = false;
-            parent = fixture('empty').children[0];
-            overlay = parent.children[0];
-            overlayPart = overlay.$.overlay;
-            content = overlay.$.content;
-            overlay._observer.flush();
-            overlay.opened = true;
-          });
-
-          it('should focus the overlayPart when focusTrap = true', (done) => {
-            overlay.addEventListener('vaadin-overlay-open', () => {
-              expect(overlay._focusedElement).to.eql(overlayPart);
-              done();
-            });
-          });
+        it('should be the last when only one overlay is opened', () => {
+          overlay1.opened = true;
+          expect(overlay1._last).to.be.true;
         });
 
-        describe('multiple overlays', function() {
-          let overlay1, overlay2;
+        it('should not be the last when another overlay is opened after this', () => {
+          overlay2.opened = true;
+          expect(overlay1._last).not.to.be.true;
+          expect(overlay2._last).to.be.true;
+        });
 
-          beforeEach(function() {
-            overlay1 = overlay;
-            overlay2 = fixture('empty').children[0].children[0];
-          });
+        it('should become last when the last overlay is closed', () => {
+          overlay1.opened = true;
+          overlay2.opened = true;
+          overlay2.opened = false;
+          expect(overlay1._last).to.be.true;
+        });
 
-          afterEach(() => overlay2.opened = false);
+        it('should fire the vaadin-overlay-escape-press if it is the only overlay opened', () => {
+          var spy = sinon.spy();
+          overlay1.addEventListener('vaadin-overlay-escape-press', spy);
+          overlay1.opened = true;
+          MockInteractions.pressAndReleaseKeyOn(document.body, 27, [], 'Escape');
+          expect(spy).to.be.called.once;
+        });
 
-          it('should be the last when only one overlay is opened', () => {
-            overlay1.opened = true;
-            expect(overlay1._last).to.be.true;
-          });
+        it('should not fire the vaadin-overlay-escape-press if there is a recent overlay opened', () => {
+          var spy = sinon.spy();
+          overlay1.addEventListener('vaadin-overlay-escape-press', spy);
+          overlay1.opened = true;
+          overlay2.opened = true;
+          MockInteractions.pressAndReleaseKeyOn(document.body, 27, [], 'Escape');
+          expect(spy).not.to.be.called;
+        });
 
-          it('should not be the last when another overlay is opened after this', () => {
-            overlay1.opened = true;
-            overlay2.opened = true;
-            expect(overlay1._last).not.to.be.true;
-            expect(overlay2._last).to.be.true;
-          });
+        it('should fire the vaadin-overlay-outside-click if it is the only overlay opened', () => {
+          var spy = sinon.spy();
+          overlay1.addEventListener('vaadin-overlay-outside-click', spy);
+          overlay1.opened = true;
+          click(parent);
+          expect(spy).to.be.called.once;
+        });
 
-          it('should become last when the last overlay is closed', () => {
-            overlay1.opened = true;
-            overlay2.opened = true;
-            overlay2.opened = false;
-            expect(overlay1._last).to.be.true;
-          });
+        it('should not fire the vaadin-overlay-outside-click if there is a recent overlay opened', () => {
+          var spy = sinon.spy();
+          overlay1.addEventListener('vaadin-overlay-outside-click', spy);
+          overlay1.opened = true;
+          overlay2.opened = true;
+          click(parent);
+          expect(spy).not.to.be.called;
+        });
 
-          it('should fire the vaadin-overlay-escape-press if it is the only overlay opened', () => {
-            var spy = sinon.spy();
-            overlay1.addEventListener('vaadin-overlay-escape-press', spy);
-            overlay1.opened = true;
-            MockInteractions.pressAndReleaseKeyOn(document.body, 27, [], 'Escape');
-            expect(spy).to.be.called.once;
-          });
+        it('should restore correctly pointer events when overlays are not closed in order', () => {
+          overlay1.opened = true;
+          overlay2.opened = true;
+          expect(document.body.style.pointerEvents).to.eql('none');
 
-          it('should not fire the vaadin-overlay-escape-press if there is a recent overlay opened', () => {
-            var spy = sinon.spy();
-            overlay1.addEventListener('vaadin-overlay-escape-press', spy);
-            overlay1.opened = true;
-            overlay2.opened = true;
-            MockInteractions.pressAndReleaseKeyOn(document.body, 27, [], 'Escape');
-            expect(spy).not.to.be.called;
-          });
-
-          it('should fire the vaadin-overlay-outside-click if it is the only overlay opened', () => {
-            var spy = sinon.spy();
-            overlay1.addEventListener('vaadin-overlay-outside-click', spy);
-            overlay1.opened = true;
-            click(parent);
-            expect(spy).to.be.called.once;
-          });
-
-          it('should not fire the vaadin-overlay-outside-click if there is a recent overlay opened', () => {
-            var spy = sinon.spy();
-            overlay1.addEventListener('vaadin-overlay-outside-click', spy);
-            overlay1.opened = true;
-            overlay2.opened = true;
-            click(parent);
-            expect(spy).not.to.be.called;
-          });
-
-          it('should restore correctly pointer events when overlays are not closed in order', () => {
-            overlay1.opened = true;
-            overlay2.opened = true;
-            expect(document.body.style.pointerEvents).to.eql('none');
-
-            overlay1.opened = false;
-            overlay2.opened = false;
-            expect(document.body.style.pointerEvents).to.eql('');
-          });
+          overlay1.opened = false;
+          overlay2.opened = false;
+          expect(document.body.style.pointerEvents).to.eql('');
         });
       });
 

@@ -112,11 +112,10 @@ This program is available under Apache License Version 2.0, available at https:/
     </style>
 
     <div id="backdrop" part="backdrop" hidden$="{{!withBackdrop}}">
-
     </div>
     <div part="overlay" id="overlay">
       <input id="first-focus-mark">
-      <div part="content" id="content"></div>
+      <div part="content" id="content" tabindex="-1"></div>
       <input id="last-focus-mark">
     </div>
   </template>
@@ -421,9 +420,11 @@ This program is available under Apache License Version 2.0, available at https:/
        */
       _openedChanged(opened) {
         if (opened) {
-          this._placeholder = document.createComment('vaadin-overlay-placeholder');
-          this.parentNode.insertBefore(this._placeholder, this);
-          document.body.appendChild(this);
+          if (!this._placeholder) {
+            this._placeholder = document.createComment('vaadin-overlay-placeholder');
+            this.parentNode.insertBefore(this._placeholder, this);
+            document.body.appendChild(this);
+          }
 
           Polymer.RenderStatus.afterNextRender(this, () => {
             if (this.focusTrap) {
@@ -433,8 +434,7 @@ This program is available under Apache License Version 2.0, available at https:/
               this._firstFocusable.focus();
             }
 
-            const evt = new CustomEvent('vaadin-overlay-open', {bubbles: true});
-            this.dispatchEvent(evt);
+            this.dispatchEvent(new CustomEvent('vaadin-overlay-open', {bubbles: true}));
           });
 
           if (!this.modeless) {
@@ -445,8 +445,12 @@ This program is available under Apache License Version 2.0, available at https:/
             this._placeholder.parentNode.insertBefore(this, this._placeholder);
             this._processPendingMutationObserversFor(document.body);
             this._placeholder.parentNode.removeChild(this._placeholder);
+            this._placeholder = undefined;
           }
-          this._exitModalState();
+
+          if (!this.modeless) {
+            this._exitModalState();
+          }
         }
       }
 
