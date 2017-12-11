@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>vaadin-overlay Basic Examples</title>
+
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+  <link rel="import" href="../../vaadin-text-field/vaadin-text-field.html">
+  <link rel="import" href="../../vaadin-text-field/vaadin-password-field.html">
+  <link rel="import" href="../../vaadin-text-field/vaadin-textarea.html">
+  <link rel="import" href="../../vaadin-date-picker/vaadin-date-picker.html">
+  <link rel="import" href="../../vaadin-combo-box/vaadin-combo-box.html">
+  <link rel="import" href="../../vaadin-context-menu/vaadin-context-menu.html">
+  <link rel="import" href="../../vaadin-dropdown-menu/vaadin-dropdown-menu.html">
+  <link rel="import" href="../../vaadin-list-box/vaadin-list-box.html">
+  <link rel="import" href="../../vaadin-item/vaadin-item.html">
+  <link rel="import" href="../../vaadin-dialog/vaadin-dialog.html">
+  <link rel="import" href="../../vaadin-button/vaadin-button.html">
+  <link rel="import" href="common.html">
+</head>
+
+<body unresolved>
+  <div class="vertical-section-container centered">
+
+    <demo-navigation></demo-navigation>
+    <h3>Form in Dialog</h3>
+    <demo-snippet id='overlay-advanced-demos-form-dialog'>
+      <template>
+
+        <dom-module id="my-form-element">
+          <template preserve-content>
+            <vaadin-text-field tabindex="4" label="Text Field" placeholder="TabIndex 4"></vaadin-text-field>
+            <vaadin-password-field tabindex="3"  label="Password Field" placeholder="TabIndex 3"></vaadin-password-field>
+            <vaadin-date-picker tabindex="2" label="Date Picker" placeholder="TabIndex 2"></vaadin-date-picker>
+            <br/>
+            <vaadin-combo-box tabindex="2" label="Combo Box" placeholder="TabIndex 2" items="[1, 2, 3]"></vaadin-combo-box>
+            <vaadin-dropdown-menu tabindex="1" label="Dropdown Menu" placeholder="TabIndex 1">
+              <template>
+                <vaadin-list-box>
+                  <vaadin-item>Item 1</vaadin-item>
+                  <vaadin-item>Item 2</vaadin-item>
+                  <vaadin-item>Item 3</vaadin-item>
+                </vaadin-list-box>
+              </template>
+            </vaadin-dropdown-menu>
+            <vaadin-text-field label="Text Field" placeholder="TabIndex 0"></vaadin-text-field>
+            <br/>
+            <vaadin-context-menu selector="vaadin-button" open-on="click" close-on="none">
+              <template>
+                <vaadin-list-box>
+                  <vaadin-item>Item 1</vaadin-item>
+                  <vaadin-item>Item 2</vaadin-item>
+                  <vaadin-item>Item 3</vaadin-item>
+                </vaadin-list-box>
+              </template>
+              <vaadin-button>Context Menu, TabIndex 0</vaadin-button>
+            </vaadin-context-menu>
+
+            <vaadin-button>NOP, TabIndex 0</vaadin-button>
+            <vaadin-button tabindex="1">NOP, TabIndex 1</vaadin-button>
+          </template>
+          <script>
+            class MyFormElement extends Polymer.Element {
+              static get is() {
+                return 'my-form-element';
+              }
+            }
+            window.customElements.define(MyFormElement.is, MyFormElement);
+          </script>
+        </dom-module>
+
+        <vaadin-dialog id="dialog">
+          <template>
+            <my-form-element></my-form-element>
+          </template>
+        </vaadin-dialog>
+        <vaadin-button id="button">Show Form Dialog</vaadin-button>
+
+        <script>
+          window.addEventListener('WebComponentsReady', () => {
+            const dlg = document.querySelector('#dialog');
+            const btn = document.querySelector('#button');
+            btn.addEventListener('click', () => dlg.opened = true);
+          });
+        </script>
+
+        <my-demo2></my-demo2>
+      </template>
+    </demo-snippet>
+
+
+    <h3>Nested Dialog</h3>
+    <demo-snippet id='overlay-advanced-demos-nested-dialog'>
+      <template>
+        <dom-module id="my-demo1">
+          <template preserve-content>
+            <vaadin-dialog id="dialog1">
+              <template>
+                <div>You can close this dialog by pressing 'Close' button</div>
+                <div>By pressing the other one, second dialog will be opened</div>
+                <br>
+                <vaadin-button on-click="_close1">Close</vaadin-button>
+                <vaadin-button on-click="_open2">Open second</vaadin-button>
+              </template>
+            </vaadin-dialog>
+
+            <vaadin-dialog id="dialog2">
+              <template>
+                <div>Close this dialog by pressing 'Close'</div>
+                <div>Use the second button to close both dialogs</div>
+                <br>
+                <vaadin-button on-click="_close2">Cancel</vaadin-button>
+                <vaadin-button on-click="_closeAll">Close All</vaadin-button>
+              </template>
+            </vaadin-dialog>
+
+            <vaadin-button on-click="_open1">Show dialog</vaadin-button>
+          </template>
+
+          <script>
+            class MyDemo1 extends Polymer.Element {
+              static get is() {
+                return 'my-demo1';
+              }
+              _open1() {
+                this.$.dialog1.opened = true;
+              }
+              _open2() {
+                this.$.dialog2.opened = true;
+              }
+              _close1() {
+                this.$.dialog1.opened = false;
+              }
+              _close2() {
+                this.$.dialog2.opened = false;
+              }
+              _closeAll() {
+                this.$.dialog2.opened = false;
+                this.$.dialog1.opened = false;
+              }
+            }
+            window.customElements.define(MyDemo1.is, MyDemo1);
+          </script>
+        </dom-module>
+        <my-demo1></my-demo1>
+      </template>
+    </demo-snippet>
+  </div>
+</body>
+</html>

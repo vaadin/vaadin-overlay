@@ -208,7 +208,7 @@ This program is available under Apache License Version 2.0, available at https:/
       }
 
       static get observers() {
-        return ['_openedChanged(opened)', '_templateChanged(template)', '_contentChanged(content)'];
+        return ['_openedChanged(opened)', '_focusTrapChanged(focusTrap)', '_templateChanged(template)', '_contentChanged(content)'];
       }
 
       constructor() {
@@ -347,6 +347,10 @@ This program is available under Apache License Version 2.0, available at https:/
         }
       }
 
+      _isFocused(element) {
+        return element && element.getRootNode().activeElement === element;
+      }
+
       /**
        * @event vaadin-overlay-escape-press
        * fired before the `vaadin-overlay` will be closed on ESC button press. If canceled the closing of the overlay is canceled as well.
@@ -359,19 +363,18 @@ This program is available under Apache License Version 2.0, available at https:/
         // TAB
         if (event.key === 'Tab' && this.focusTrap) {
           const focusableElements = this._getFocusableElements();
-          const focusedElementIndex = focusableElements.indexOf(this._focusedElement);
-
-          // Cycle to the next button
-          if (!event.shiftKey) {
-            this._setFocus(focusedElementIndex, 1);
-
-          // Cycle to the prev button
-          } else {
-            this._setFocus(focusedElementIndex, -1);
+          // _focusedElement might be wrong when the user moves the focus by mouse or programatically
+          if (!this._isFocused(this._focusedElement)) {
+            this._focusedElement = focusableElements.reduce((prev, e) => {
+              return !prev && e.getRootNode().activeElement === e ? e : prev;
+            }, undefined);
           }
 
+          if (this._isFocused(this._focusedElement)) {
+            // Move focus to the next/previous element
+            this._setFocus(focusableElements.indexOf(this._focusedElement), event.shiftKey ? -1 : 1);
+          }
           event.preventDefault();
-
         // ESC
         } else if (event.key === 'Escape' || event.key === 'Esc') {
           const evt = new CustomEvent('vaadin-overlay-escape-press', {bubbles: true, cancelable: true, detail: {sourceEvent: event}});
@@ -476,6 +479,7 @@ This program is available under Apache License Version 2.0, available at https:/
       }
 
       _contentChanged(content) {
+        delete this._focusableElements;
         this.$.content.appendChild(content);
       }
 
@@ -501,7 +505,7 @@ This program is available under Apache License Version 2.0, available at https:/
 
           // determine if element is visible
           const el = focusableElements[index];
-          if (this._isVisible(el)) {
+          if (!el.disabled && this._isVisible(el)) {
             this._focusedElement = el;
             return el.focus();
           }
@@ -517,30 +521,33 @@ This program is available under Apache License Version 2.0, available at https:/
         return elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length;
       }
 
-      _getFocusableElements() {
-        // collect all focusable elements
-        const focusableElements = Array.from(this.$.content.querySelectorAll(
-          '[tabindex], button, input, select, textarea, object, iframe, label, a[href], area[href]'
-        )).filter((el) => {
-          return el.getAttribute('tabindex') !== '-1';
-        });
+      _tabindex(e) {
+        // Should use `element.tabIndex` which returns -1 when the element is not focusable, and 0
+        // when the element is natively focusable. Though, IE and Edge returns zero for both, hence
+        // we need to deal with attribute values and tag-names to correctly compute it.
+        let i = parseInt(e.getAttribute('tabindex'));
+        i = !isNaN(i) ? i : /^(button|input|select|textarea|object|iframe|a|area)$/i.test(e.localName) ? 0 : -1;
+        // tabIndex zero has the lowest preference, thus setting it to Infinity allows natural sorting.
+        return i ? i : Infinity;
+      }
 
-        // sort focusable elements according to tabindex
-        return focusableElements.sort((a, b) => {
-          a = parseInt(a.getAttribute('tabindex')) || 0;
-          b = parseInt(b.getAttribute('tabindex')) || 0;
-          if (a === b) {
-            return 0;
-          } else if (a === 0) {
-            return 1;
-          } else if (b === 0) {
-            return -1;
-          } else if (a < b) {
-            return -1;
-          } else if (a > b) {
-            return 1;
-          }
-        });
+      // Recursively collect all focusable elements deeping into shadowRoots
+      _focusableArray(elem) {
+        const arr = elem.shadowRoot && this._tabindex(elem) >= 0 ? [] :
+          Array.from((elem.shadowRoot || elem).querySelectorAll('*'));
+
+        return arr
+          .reduce((prev, e) => prev.concat(this._focusableArray(e)), [elem])
+          .filter(e => this._tabindex(e) >= 0)
+          .sort((a, b) => this._tabindex(a) > this._tabindex(b));
+      }
+
+      _getFocusableElements() {
+        return this._focusableElements || (this._focusableElements = this._focusableArray(this.$.content));
+      }
+
+      _focusTrapChanged() {
+        delete this._focusableElements;
       }
 
       _processPendingMutationObserversFor(node) {
