@@ -132,7 +132,7 @@
           overlay.focusTrap = true;
 
           // focusableElements changes when setting focus trap property
-          focusableElements = overlay._getFocusableElements()
+          focusableElements = overlay._getFocusableElements();
           const testelement = content.querySelector('my-test-element');
 
           expect(focusableElements.length).to.eql(5);

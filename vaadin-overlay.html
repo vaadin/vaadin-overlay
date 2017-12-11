@@ -347,6 +347,10 @@ This program is available under Apache License Version 2.0, available at https:/
         }
       }
 
+      _isFocused(element) {
+        return element && element.getRootNode().activeElement === element;
+      }
+
       /**
        * @event vaadin-overlay-escape-press
        * fired before the `vaadin-overlay` will be closed on ESC button press. If canceled the closing of the overlay is canceled as well.
@@ -359,19 +363,18 @@ This program is available under Apache License Version 2.0, available at https:/
         // TAB
         if (event.key === 'Tab' && this.focusTrap) {
           const focusableElements = this._getFocusableElements();
-          const focusedElementIndex = focusableElements.indexOf(this._focusedElement);
-
-          // Cycle to the next button
-          if (!event.shiftKey) {
-            this._setFocus(focusedElementIndex, 1);
-
-          // Cycle to the prev button
-          } else {
-            this._setFocus(focusedElementIndex, -1);
+          // _focusedElement might be wrong when the user moves the focus by mouse or programatically
+          if (!this._isFocused(this._focusedElement)) {
+            this._focusedElement = focusableElements.reduce((prev, e) => {
+              return !prev && e.getRootNode().activeElement === e ? e : prev;
+            }, undefined);
           }
 
+          if (this._isFocused(this._focusedElement)) {
+            // Move focus to the next/previous element
+            this._setFocus(focusableElements.indexOf(this._focusedElement), event.shiftKey ? -1 : 1);
+          }
           event.preventDefault();
-
         // ESC
         } else if (event.key === 'Escape' || event.key === 'Esc') {
           const evt = new CustomEvent('vaadin-overlay-escape-press', {bubbles: true, cancelable: true, detail: {sourceEvent: event}});
