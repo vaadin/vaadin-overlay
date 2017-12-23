@@ -10,10 +10,53 @@
 
 <body>
   <script>
+    WCT._config.environmentScripts.push('iron-test-helpers/mock-interactions.js');
+    WCT._config.environmentScripts.push(location.href.replace(/[^/]+$/, '') + 'mock-touch-interactions.js');
+
     WCT._config.environmentScripts.push('webcomponentsjs/webcomponents-lite.js');
 
     WCT.loadSuites([
-      'vaadin-overlay.html'
+      'vaadin-overlay.html',
+      // vaadin-combo-box
+      '../../vaadin-combo-box/test/vaadin-combo-box.html',
+      '../../vaadin-combo-box/test/toggling-dropdown.html',
+      '../../vaadin-combo-box/test/overlay-position.html',
+      '../../vaadin-combo-box/test/selecting-items.html',
+      '../../vaadin-combo-box/test/form-input.html',
+      '../../vaadin-combo-box/test/filtering.html',
+      '../../vaadin-combo-box/test/keyboard.html',
+      '../../vaadin-combo-box/test/scrolling.html',
+      '../../vaadin-combo-box/test/aria.html',
+      '../../vaadin-combo-box/test/using-object-values.html',
+      '../../vaadin-combo-box/test/data-binding.html',
+      '../../vaadin-combo-box/test/late-upgrade.html',
+      '../../vaadin-combo-box/test/vaadin-combo-box-light.html',
+      '../../vaadin-combo-box/test/item-template.html',
+      '../../vaadin-combo-box/test/vaadin-combo-box-dropdown.html',
+      // vaadin-context-menu
+      '../../vaadin-context-menu/test/context.html',
+      '../../vaadin-context-menu/test/device-detector.html',
+      '../../vaadin-context-menu/test/integration.html',
+      '../../vaadin-context-menu/test/selection.html',
+      '../../vaadin-context-menu/test/properties.html',
+      '../../vaadin-context-menu/test/overlay.html',
+      '../../vaadin-context-menu/test/template.html',
+      '../../vaadin-context-menu/test/touch.html',
+      // vaadin-date-picker
+      '../../vaadin-date-picker/test/basic.html',
+      '../../vaadin-date-picker/test/dropdown.html',
+      '../../vaadin-date-picker/test/overlay.html',
+      '../../vaadin-date-picker/test/month-calendar.html',
+      '../../vaadin-date-picker/test/scroller.html',
+      '../../vaadin-date-picker/test/form-input.html',
+      '../../vaadin-date-picker/test/custom-input.html',
+      '../../vaadin-date-picker/test/keyboard-navigation.html',
+      '../../vaadin-date-picker/test/keyboard-input.html',
+      '../../vaadin-date-picker/test/late-upgrade.html',
+      '../../vaadin-date-picker/test/wai-aria.html',
+      // vaadin-dropdown-menu
+      '../../vaadin-dropdown-menu/test/dropdown-menu-test.html',
+      '../../vaadin-dropdown-menu/test/scrollable-viewport-test.html'
     ].reduce(function(suites, suite) {
       return suites.concat([suite, `${suite}?wc-shadydom=true`]);
     }, []));
