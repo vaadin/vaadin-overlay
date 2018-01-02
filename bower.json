@@ -33,6 +33,12 @@
     "iron-demo-helpers": "^2.0.0",
     "iron-test-helpers": "^2.0.0",
     "vaadin-button": "^2.0.0",
-    "web-component-tester": "^6.0.0"
+    "web-component-tester": "^6.0.0",
+    "vaadin-combo-box": "#master",
+    "vaadin-context-menu": "#master",
+    "vaadin-date-picker": "#master",
+    "vaadin-dropdown-menu": "#master",
+    "iron-form": "^2.0.0",
+    "iron-input": "^2.0.0"
   }
 }
