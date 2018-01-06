@@ -44,7 +44,8 @@
     "vaadin-dropdown-menu": "master",
     "vaadin-item": "master",
     "vaadin-list-box": "master",
-    "web-component-tester": "^6.0.0"
+    "web-component-tester": "^6.0.0",
+    "vaadin-ordered-layout": "master"
   },
   "resolutions": {
     "vaadin-item": "master"
