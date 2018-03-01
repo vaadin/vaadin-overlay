@@ -116,6 +116,7 @@ This program is available under Apache License Version 2.0, available at https:/
      * Custom CSS property | Description | Default value
      * ---|---|---
      * `--vaadin-overlay-viewport-bottom` | Bottom offset of the visible viewport area | `0` or detected offset
+     * `--vaadin-overlay-context-width` | The `offsetWidth` of the parent/host element of the overlay (e.g. vaadin-dropdown-menu host) |
      *
      * See [ThemableMixin – how to apply styles for shadow parts](https://github.com/vaadin/vaadin-themable-mixin/wiki)
      *
@@ -406,6 +407,8 @@ This program is available under Apache License Version 2.0, available at https:/
       }
 
       _attachOverlay() {
+        const parent = this.parentNode.host || this.parentNode;
+        this.updateStyles({'--vaadin-overlay-context-width': parent.offsetWidth + 'px'});
         this._placeholder = document.createComment('vaadin-overlay-placeholder');
         this.parentNode.insertBefore(this._placeholder, this);
         document.body.appendChild(this);
