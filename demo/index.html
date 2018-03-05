@@ -232,6 +232,48 @@
         </style>
       </template>
     </dom-module>
+
+    <h3>Using the parent/context width to control the width of the overlay</h3>
+    <demo-snippet>
+      <template>
+        <dom-module id="overlay-width" theme-for="vaadin-overlay">
+          <template>
+            <style>
+              :host(.context-width) [part="overlay"] {
+                min-width: var(--vaadin-overlay-context-width);
+                background-color: #fff;
+                border: 1px solid;
+              }
+            </style>
+          </template>
+        </dom-module>
+        <p>Makes the overlay adapts it’s width to its context (the <code>&lt;demo-snippet&gt;</code> element in this case). The width is updated when the overlay is opened, not continously (e.g. when browser window resize cause the parent/context width to change).</p>
+        <vaadin-overlay class="context-width">
+          <template>The overlay width is always at least as wide as the context it is placed in. The overlay still grows with its content.</template>
+        </vaadin-overlay>
+        <vaadin-button id="button-overlay-context-width">Show the overlay</vaadin-button>
+        <script>
+          document.getElementById('button-overlay-context-width').addEventListener('click', event => {
+            const overlay = event.target.previousElementSibling;
+            overlay.opened = true;
+          });
+        </script>
+      </template>
+    </demo-snippet>
+
+    <!-- Needs to be duplicated for polyfilled browsers, doesn’t work from inside demo-snippet -->
+    <dom-module id="overlay-width" theme-for="vaadin-overlay">
+      <template>
+        <style>
+          :host(.context-width) [part="overlay"] {
+            min-width: var(--vaadin-overlay-context-width);
+            background-color: #fff;
+            border: 1px solid;
+          }
+        </style>
+      </template>
+    </dom-module>
+
   </div>
 </body>
 </html>
