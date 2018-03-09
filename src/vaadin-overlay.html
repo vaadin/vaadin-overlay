@@ -393,16 +393,18 @@ This program is available under Apache License Version 2.0, available at https:/
       _animatedOpening() {
         this._attachOverlay();
         this.setAttribute('opening', '');
-        const name = getComputedStyle(this).getPropertyValue('animation-name');
-        if (name && name != 'none') {
-          const listener = () => {
-            this.removeEventListener('animationend', listener);
+        setTimeout(() => {
+          const name = getComputedStyle(this).getPropertyValue('animation-name');
+          if (name && name != 'none') {
+            const listener = () => {
+              this.removeEventListener('animationend', listener);
+              this.removeAttribute('opening');
+            };
+            this.addEventListener('animationend', listener);
+          } else {
             this.removeAttribute('opening');
-          };
-          this.addEventListener('animationend', listener);
-        } else {
-          this.removeAttribute('opening');
-        }
+          }
+        }, 1);
       }
 
       _attachOverlay() {
@@ -560,4 +562,3 @@ This program is available under Apache License Version 2.0, available at https:/
     Vaadin.OverlayElement = OverlayElement;
   })();
 </script>
-
