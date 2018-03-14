@@ -1,0 +1,96 @@
+<!doctype html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>vaadin-overlay tests</title>
+  <script src="../../web-component-tester/browser.js"></script>
+  <link rel="import" href="../../iron-test-helpers/iron-test-helpers.html">
+  <link rel="import" href="../vaadin-overlay.html">
+  <script src="common.js"></script>
+</head>
+
+<body>
+  <dom-module id="overlay-animations" theme-for="vaadin-overlay">
+    <template>
+      <style>
+        :host([opening]) {
+          animation: vaadin-overlay-enter 50ms;
+        }
+
+        @keyframes vaadin-overlay-enter {
+          0% {
+            opacity: 0;
+            transform: rotate(180deg);
+          }
+        }
+
+        :host([closing]) {
+          animation: vaadin-overlay-exit 50ms;
+        }
+
+        @keyframes vaadin-overlay-exit {
+          100% {
+            opacity: 0;
+            transform: rotate(180deg);
+          }
+        }
+      </style>
+    </template>
+  </dom-module>
+
+  <test-fixture id="default">
+    <template>
+      <div>
+        <div id="parent">
+          <vaadin-overlay>
+            <template>
+              Content
+            </template>
+          </vaadin-overlay>
+        </div>
+      </div>
+    </template>
+  </test-fixture>
+
+  <script>
+    describe('overlay', function() {
+      var overlay, parent;
+
+      beforeEach(() => {
+        parent = fixture('default').children[0];
+        overlay = parent.children[0];
+        overlay._observer.flush();
+        overlay.opened = true;
+      });
+
+      afterEach(done => {
+        // Avoid stacking up <vaadin-overlay> elements in the body.
+        overlay.opened = false;
+        setTimeout(done, 100);
+      });
+
+      it('should set `opening` attribute and remove later', done => {
+        expect(overlay.hasAttribute('opening')).to.be.true;
+
+        listenOnce(overlay, 'animationend', () => {
+          setTimeout(() => {
+            expect(overlay.hasAttribute('opening')).to.be.false;
+            done();
+          });
+        });
+      });
+
+      it('should set `closing` attribute and remove later', done => {
+        overlay.opened = false;
+        expect(overlay.hasAttribute('closing')).to.be.true;
+
+        listenOnce(overlay, 'animationend', () => {
+          setTimeout(() => {
+            expect(overlay.hasAttribute('closing')).to.be.false;
+            done();
+          });
+        });
+      });
+    });
+  </script>
+</body>
