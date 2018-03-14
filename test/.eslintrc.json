@@ -9,6 +9,7 @@
     "expect": false,
     "gemini": false,
     "sinon": false,
+    "listenOnce": false,
     "MockInteractions": false
   }
 }
