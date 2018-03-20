@@ -64,16 +64,14 @@
 
   <test-fixture id="overlay-with-notification">
     <template>
-      <div id="parent">
-        <vaadin-overlay focus-trap>
-          <template>
-          </template>
-        </vaadin-overlay>
-        <vaadin-notification duration="0">
-          <template>
-          </template>
-        </vaadin-notification>
-      </div>
+      <vaadin-overlay focus-trap>
+        <template>
+        </template>
+      </vaadin-overlay>
+      <vaadin-notification duration="0">
+        <template>
+        </template>
+      </vaadin-notification>
     </template>
   </test-fixture>
 
@@ -660,12 +658,10 @@
     });
 
     describe('overlay with notification', function() {
-      var overlay, parent, notification;
+      let overlay, notification;
 
       beforeEach(function() {
-        parent = fixture('overlay-with-notification');
-        overlay = parent.children[0];
-        notification = parent.children[1];
+        [overlay, notification] = fixture('overlay-with-notification');
       });
 
       it('should not close the overlay by clicking on notification', () => {
