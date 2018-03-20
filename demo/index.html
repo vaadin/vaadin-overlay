@@ -9,6 +9,7 @@
 
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
   <link rel="import" href="../../vaadin-button/vaadin-button.html">
+  <link rel="import" href="../../vaadin-notification/vaadin-notification.html">
   <link rel="import" href="common.html">
 </head>
 
@@ -201,6 +202,41 @@
             overlay.opened = true;
           });
         </script>
+      </template>
+    </demo-snippet>
+
+
+    <h3>Overlay opened along with notification</h3>
+    <demo-snippet>
+      <template preserve-content>
+        <dom-bind id="bind-elm">
+          <template>
+            <vaadin-overlay id="overlay">
+              <template>I will not be closed by clicking on notification</template>
+            </vaadin-overlay>
+            <vaadin-notification id="notification" duration="0" position="bottom-end">
+              <template>
+                This notification remains opened until the button inside is clicked.
+                <vaadin-button on-click="_close">Close</vaadin-button>
+              </template>
+            </vaadin-notification>
+            <vaadin-button on-click="_open" id="button-overlay-notification">Show the overlay with notification</vaadin-button>
+            <script>
+              window.addEventListener('WebComponentsReady', function() {
+                const domBind = document.querySelector('#bind-elm');
+                const overlay = document.querySelector('#overlay');
+                const notification = document.querySelector('#notification');
+                domBind._open = function() {
+                  overlay.opened = true;
+                  notification.open();
+                };
+                domBind._close = function() {
+                  notification.close();
+                };
+              });
+            </script>
+          </template>
+        </dom-bind>
       </template>
     </demo-snippet>
 
