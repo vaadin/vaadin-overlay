@@ -322,7 +322,8 @@ This program is available under Apache License Version 2.0, available at https:/
           this._mouseUpInside = false;
           return;
         }
-        if (!this._last) {
+
+        if (!this._last || event.composedPath().filter(el => el.localName === 'vaadin-notification-card')[0]) {
           return;
         }
 
