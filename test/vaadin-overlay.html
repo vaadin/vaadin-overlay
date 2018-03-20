@@ -64,17 +64,15 @@
 
   <test-fixture id="overlay-with-notification">
     <template>
-      <div>
-        <div id="parent">
-          <vaadin-overlay focus-trap>
-            <template>
-            </template>
-          </vaadin-overlay>
-          <vaadin-notification duration="0">
-            <template>
-            </template>
-          </vaadin-notification>
-        </div>
+      <div id="parent">
+        <vaadin-overlay focus-trap>
+          <template>
+          </template>
+        </vaadin-overlay>
+        <vaadin-notification duration="0">
+          <template>
+          </template>
+        </vaadin-notification>
       </div>
     </template>
   </test-fixture>
@@ -665,7 +663,7 @@
       var overlay, parent, notification;
 
       beforeEach(function() {
-        parent = fixture('overlay-with-notification').children[0];
+        parent = fixture('overlay-with-notification');
         overlay = parent.children[0];
         notification = parent.children[1];
       });
