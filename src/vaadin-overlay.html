@@ -459,9 +459,7 @@ This program is available under Apache License Version 2.0, available at https:/
         this.parentNode.insertBefore(this._placeholder, this);
         document.body.appendChild(this);
         if (this._shadyStyleScope) {
-          Array.from(this.$.content.shadowRoot.querySelectorAll('*')).forEach(el => {
-            el.classList.add('style-scope', this._shadyStyleScope);
-          });
+          this.$.content.setAttribute('is', this._shadyStyleScope);
         }
       }
 
@@ -545,6 +543,10 @@ This program is available under Apache License Version 2.0, available at https:/
             this.content.removeChild(node);
           }
         });
+
+        if (this._shadyStyleScope) {
+          this.$.content.removeAttribute('is');
+        }
 
         this._observer.connect();
 
