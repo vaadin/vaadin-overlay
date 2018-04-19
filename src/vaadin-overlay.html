@@ -477,6 +477,9 @@ This program is available under Apache License Version 2.0, available at https:/
       }
 
       _detachOverlay() {
+        if (this.opened || !this._placeholder.parentNode) {
+          return;
+        }
         this._placeholder.parentNode.insertBefore(this, this._placeholder);
         this._processPendingMutationObserversFor(document.body);
         this._placeholder.parentNode.removeChild(this._placeholder);
