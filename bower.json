@@ -50,6 +50,7 @@
     "web-component-tester": "^6.0.0"
   },
   "resolutions": {
-    "vaadin-item": "master"
+    "vaadin-item": "master",
+    "vaadin-material-styles": "vaadin/vaadin-material-styles#md-preview"
   }
 }
