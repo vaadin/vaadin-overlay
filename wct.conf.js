@@ -5,44 +5,38 @@ module.exports = {
 
   registerHooks: function(context) {
     const saucelabsPlatformsMobile = [
-      'macOS 10.12/iphone@11.0',
-      'macOS 10.12/ipad@11.0',
-    ];
-
-    const saucelabsPlatformsPolyfilled = [
-      'Windows 10/microsoftedge@15',
-      'Windows 10/internet explorer@11',
+      'iOS Simulator/iphone@11.3',
+      'iOS Simulator/iphone@9.3'
     ];
 
     const saucelabsPlatformsDesktop = [
-      'macOS 10.12/safari@11.0'
+      'macOS 10.13/safari@11.1',
+      'Windows 10/microsoftedge@17',
+      'Windows 10/internet explorer@11'
     ];
 
     const cronPlatforms = [
-      'Android/chrome',
-      'Windows 10/chrome@60',
-      'Windows 10/firefox@54'
+      {
+        deviceName: 'Android GoogleAPI Emulator',
+        platformName: 'Android',
+        platformVersion: '7.1',
+        browserName: 'chrome'
+      },
+      'iOS Simulator/ipad@11.3',
+      'iOS Simulator/iphone@10.3',
+      'Windows 10/chrome@latest',
+      'Windows 10/firefox@latest'
     ];
 
     switch (argv.env) {
       case 'saucelabs:mobile':
         context.options.plugins.sauce.browsers = saucelabsPlatformsMobile;
         break;
-      case 'saucelabs:polyfilled':
-        context.options.plugins.sauce.browsers = saucelabsPlatformsPolyfilled;
-        break;
       case 'saucelabs:desktop':
         context.options.plugins.sauce.browsers = saucelabsPlatformsDesktop;
         break;
       case 'saucelabs-cron':
         context.options.plugins.sauce.browsers = cronPlatforms;
-        break;
-      case 'saucelabs':
-        context.options.plugins.sauce.browsers = cronPlatforms.concat(
-          saucelabsPlatformsDesktop,
-          saucelabsPlatformsMobile,
-          saucelabsPlatformsPolyfilled
-        );
         break;
     }
   },
