@@ -245,10 +245,7 @@ This program is available under Apache License Version 2.0, available at https:/
            *
            * **NOTE:** The renderer callback can be called several times with previous content available
            */
-          renderer: {
-            type: Function,
-            observer: '_rendererChanged'
-          },
+          renderer: Function,
 
           /**
            * The template of the overlay content.
@@ -322,15 +319,24 @@ This program is available under Apache License Version 2.0, available at https:/
 
           _originalContentPart: Object,
 
-          _contentNodes: Array
+          _contentNodes: Array,
+
+          _oldOwner: Element,
+
+          _oldModel: Object,
+
+          _oldTemplate: Object,
+
+          _oldInstanceProps: Object,
+
+          _oldRenderer: Object
         };
       }
 
       static get observers() {
         return [
           '_openedChanged(opened)',
-          '_stampOverlayTemplate(template)',
-          '_render(renderer, owner, model)'
+          '_templateOrRendererChanged(template, renderer, owner, model, instanceProps)'
         ];
       }
 
@@ -645,20 +651,12 @@ This program is available under Apache License Version 2.0, available at https:/
         this.content = undefined;
       }
 
-      _stampOverlayTemplate(template) {
-        if (this.renderer) {
-          return;
-        }
-
+      _stampOverlayTemplate(template, instanceProps) {
         this._removeOldContent();
-
-        if (!template) {
-          return;
-        }
 
         if (!template._Templatizer) {
           template._Templatizer = Polymer.Templatize.templatize(template, this, {
-            instanceProps: this.instanceProps,
+            instanceProps: instanceProps,
             forwardHostProp: function(prop, value) {
               if (this._instance) {
                 this._instance.forwardHostProp(prop, value);
@@ -726,22 +724,43 @@ This program is available under Apache License Version 2.0, available at https:/
         }
       }
 
-      _rendererChanged(renderer, oldRenderer) {
-        this.content = this;
-
-        while (this.content.firstChild) {
-          this.content.removeChild(this.content.firstChild);
-        }
-
-        if (oldRenderer && !renderer) {
-          // Renderer was removed, restore the template
-          this._stampOverlayTemplate(this.template);
+      _removeNewRendererOrTemplate(template, oldTemplate, renderer, oldRenderer) {
+        if (template !== oldTemplate) {
+          this.template = undefined;
+        } else if (renderer !== oldRenderer) {
+          this.renderer = undefined;
         }
       }
 
-      _render(renderer, owner, model) {
-        if (renderer) {
-          this.renderer.call(this.owner, this.content, this.owner, this.model);
+      _templateOrRendererChanged(template, renderer, owner, model, instanceProps) {
+        if (template && renderer) {
+          this._removeNewRendererOrTemplate(template, this._oldTemplate, renderer, this._oldRenderer);
+          throw new Error('You should only use either a renderer or a template for overlay content');
+        }
+
+        const ownerOrModelChanged = (this._oldOwner !== owner || this._oldModel !== model);
+        this._oldModel = model;
+        this._oldOwner = owner;
+
+        const templateOrInstancePropsChanged = (this._oldInstanceProps !== instanceProps || this._oldTemplate !== template);
+        this._oldInstanceProps = instanceProps;
+        this._oldTemplate = template;
+
+        const rendererChanged = this._oldRenderer !== renderer;
+        this._oldRenderer = renderer;
+
+        if (template && !ownerOrModelChanged) {
+          this._stampOverlayTemplate(template, instanceProps);
+        } else if (renderer && !templateOrInstancePropsChanged) {
+          this.content = this;
+
+          if (rendererChanged) {
+            while (this.content.firstChild) {
+              this.content.removeChild(this.content.firstChild);
+            }
+          }
+
+          this.renderer.call(owner, this.content, owner, model);
         }
       }
 
