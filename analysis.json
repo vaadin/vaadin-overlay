@@ -8,17 +8,17 @@
       "sourceRange": {
         "file": "src/vaadin-overlay.html",
         "start": {
-          "line": 825,
+          "line": 830,
           "column": 4
         },
         "end": {
-          "line": 825,
+          "line": 830,
           "column": 40
         }
       },
       "elements": [
         {
-          "description": "`<vaadin-overlay>` is a Web Component for creating overlays. The content of the overlay can be\npopulated in two ways: imperatively using renderer callback function and declarativele\nusing Polymer Templates\n\n### Rendering\n\nBy default, the overlay uses the content provided using the renderer callback function.\n\nThe renderer function provides `root`, `owner`, `model` arguments where applicable,\nso users are able to check if there is already content in `root`. Generate content using\nproperties from `model` object if needed, append it to `root` and control the state\nof the host element by accessing `owner`.\n\n```html\n<vaadin-overlay id=\"overlay\"></vaadin-overlay>\n```\n```js\nconst overlay = document.querySelector('#overlay');\noverlay.renderer = root => {\n root.textContent = \"Overlay content\";\n};\n```\n\n**NOTE:** when the renderer property is defined, the `<template>` content is not used.\n\n**NOTE:** renderer function could be called several times, so it is a good practise to\ncheck the existing content.\n\n### Templating\n\nAlternatively, the content can be provided with Polymer Template.\nOverlay finds the child template and uses that in case renderer callback function is not provided.\nYou can also set a custom template using the `template` property.\n\nAfter the content from the template is stamped, the `content` property\npoints to the content container.\n\nThe overlay provides `forwardHostProp` when calling\n`Polymer.Templatize.templatize` for the template, so that the bindings\nfrom the parent scope propagate to the content.  You can also pass\ncustom `instanceProps` object using the `instanceProps` property.\n\n```html\n<vaadin-overlay>\n  <template>Overlay content</template>\n</vaadin-overlay>\n```\n\n**NOTE:** when using `instanceProps`: because of the Polymer limitation,\nevery template can only be templatized once, so it is important\nto set `instanceProps` before the `template` is assigned to the overlay.\n\n### Styling\n\nTo style the overlay content, use styles in the parent scope:\n\n- If the overlay is used in a component, then the component styles\n  apply the overlay content.\n- If the overlay is used in the global DOM scope, then global styles\n  apply to the overlay content.\n\nSee examples for styling the overlay content in the live demos.\n\nThe following Shadow DOM parts are available for styling the overlay component itself:\n\nPart name  | Description\n-----------|---------------------------------------------------------|\n`backdrop` | Backdrop of the overlay\n`overlay`  | Container for position/sizing/alignment of the content\n`content`  | Content of the overlay\n\nThe following state attributes are available for styling:\n\nAttribute | Description | Part\n---|---|---\n`opening` | Applied just after the overlay is attached to the DOM. You can apply a CSS @keyframe animation for this state. | `:host`\n`closing` | Applied just before the overlay is detached from the DOM. You can apply a CSS @keyframe animation for this state. | `:host`\n\nThe following custom CSS properties are available for styling:\n\nCustom CSS property | Description | Default value\n---|---|---\n`--vaadin-overlay-viewport-bottom` | Bottom offset of the visible viewport area | `0` or detected offset\n\nSee [ThemableMixin – how to apply styles for shadow parts](https://github.com/vaadin/vaadin-themable-mixin/wiki)",
+          "description": "`<vaadin-overlay>` is a Web Component for creating overlays. The content of the overlay\ncan be populated in two ways: imperatively by using renderer callback function and\ndeclaratively by using Polymer's Templates.\n\n### Rendering\n\nBy default, the overlay uses the content provided by using the renderer callback function.\n\nThe renderer function provides `root`, `owner`, `model` arguments when applicable.\nGenerate DOM content by using `model` object properties if needed, append it to the `root`\nelement and control the state of the host element by accessing `owner`. Before generating new\ncontent, users are able to check if there is already content in `root` for reusing it.\n\n```html\n<vaadin-overlay id=\"overlay\"></vaadin-overlay>\n```\n```js\nconst overlay = document.querySelector('#overlay');\noverlay.renderer = function(root) {\n root.textContent = \"Overlay content\";\n};\n```\n\n**NOTE:** when the renderer property is defined, the `<template>` content is not used.\n\n### Templating\n\nAlternatively, the content can be provided with Polymer Template.\nOverlay finds the first child template and uses that in case renderer callback function\nis not provided. You can also set a custom template using the `template` property.\n\nAfter the content from the template is stamped, the `content` property\npoints to the content container.\n\nThe overlay provides `forwardHostProp` when calling\n`Polymer.Templatize.templatize` for the template, so that the bindings\nfrom the parent scope propagate to the content.  You can also pass\ncustom `instanceProps` object using the `instanceProps` property.\n\n```html\n<vaadin-overlay>\n  <template>Overlay content</template>\n</vaadin-overlay>\n```\n\n**NOTE:** when using `instanceProps`: because of the Polymer limitation,\nevery template can only be templatized once, so it is important\nto set `instanceProps` before the `template` is assigned to the overlay.\n\n### Styling\n\nTo style the overlay content, use styles in the parent scope:\n\n- If the overlay is used in a component, then the component styles\n  apply the overlay content.\n- If the overlay is used in the global DOM scope, then global styles\n  apply to the overlay content.\n\nSee examples for styling the overlay content in the live demos.\n\nThe following Shadow DOM parts are available for styling the overlay component itself:\n\nPart name  | Description\n-----------|---------------------------------------------------------|\n`backdrop` | Backdrop of the overlay\n`overlay`  | Container for position/sizing/alignment of the content\n`content`  | Content of the overlay\n\nThe following state attributes are available for styling:\n\nAttribute | Description | Part\n---|---|---\n`opening` | Applied just after the overlay is attached to the DOM. You can apply a CSS @keyframe animation for this state. | `:host`\n`closing` | Applied just before the overlay is detached from the DOM. You can apply a CSS @keyframe animation for this state. | `:host`\n\nThe following custom CSS properties are available for styling:\n\nCustom CSS property | Description | Default value\n---|---|---\n`--vaadin-overlay-viewport-bottom` | Bottom offset of the visible viewport area | `0` or detected offset\n\nSee [ThemableMixin – how to apply styles for shadow parts](https://github.com/vaadin/vaadin-themable-mixin/wiki)",
           "summary": "",
           "path": "src/vaadin-overlay.html",
           "properties": [
@@ -29,11 +29,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 599,
+                  "line": 604,
                   "column": 6
                 },
                 "end": {
-                  "line": 601,
+                  "line": 606,
                   "column": 7
                 }
               },
@@ -50,11 +50,11 @@
               "privacy": "public",
               "sourceRange": {
                 "start": {
-                  "line": 237,
+                  "line": 234,
                   "column": 10
                 },
                 "end": {
-                  "line": 241,
+                  "line": 238,
                   "column": 11
                 }
               },
@@ -72,11 +72,11 @@
               "privacy": "public",
               "sourceRange": {
                 "start": {
-                  "line": 246,
+                  "line": 243,
                   "column": 10
                 },
                 "end": {
-                  "line": 246,
+                  "line": 243,
                   "column": 24
                 }
               },
@@ -93,11 +93,11 @@
               "privacy": "public",
               "sourceRange": {
                 "start": {
-                  "line": 260,
+                  "line": 257,
                   "column": 10
                 },
                 "end": {
-                  "line": 260,
+                  "line": 257,
                   "column": 28
                 }
               },
@@ -114,11 +114,11 @@
               "privacy": "public",
               "sourceRange": {
                 "start": {
-                  "line": 265,
+                  "line": 262,
                   "column": 10
                 },
                 "end": {
-                  "line": 268,
+                  "line": 265,
                   "column": 11
                 }
               },
@@ -136,11 +136,11 @@
               "privacy": "public",
               "sourceRange": {
                 "start": {
-                  "line": 273,
+                  "line": 270,
                   "column": 10
                 },
                 "end": {
-                  "line": 275,
+                  "line": 272,
                   "column": 11
                 }
               },
@@ -157,11 +157,11 @@
               "privacy": "public",
               "sourceRange": {
                 "start": {
-                  "line": 280,
+                  "line": 277,
                   "column": 10
                 },
                 "end": {
-                  "line": 283,
+                  "line": 280,
                   "column": 11
                 }
               },
@@ -179,11 +179,11 @@
               "privacy": "public",
               "sourceRange": {
                 "start": {
-                  "line": 285,
+                  "line": 282,
                   "column": 10
                 },
                 "end": {
-                  "line": 289,
+                  "line": 286,
                   "column": 11
                 }
               },
@@ -201,11 +201,11 @@
               "privacy": "public",
               "sourceRange": {
                 "start": {
-                  "line": 294,
+                  "line": 291,
                   "column": 10
                 },
                 "end": {
-                  "line": 294,
+                  "line": 291,
                   "column": 23
                 }
               },
@@ -222,11 +222,11 @@
               "privacy": "public",
               "sourceRange": {
                 "start": {
-                  "line": 300,
+                  "line": 297,
                   "column": 10
                 },
                 "end": {
-                  "line": 305,
+                  "line": 302,
                   "column": 11
                 }
               },
@@ -245,11 +245,11 @@
               "privacy": "public",
               "sourceRange": {
                 "start": {
-                  "line": 311,
+                  "line": 308,
                   "column": 10
                 },
                 "end": {
-                  "line": 314,
+                  "line": 311,
                   "column": 11
                 }
               },
@@ -267,11 +267,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 316,
+                  "line": 313,
                   "column": 10
                 },
                 "end": {
-                  "line": 318,
+                  "line": 315,
                   "column": 11
                 }
               },
@@ -288,11 +288,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 320,
+                  "line": 317,
                   "column": 10
                 },
                 "end": {
-                  "line": 322,
+                  "line": 319,
                   "column": 11
                 }
               },
@@ -309,11 +309,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 324,
+                  "line": 321,
                   "column": 10
                 },
                 "end": {
-                  "line": 326,
+                  "line": 323,
                   "column": 11
                 }
               },
@@ -330,11 +330,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 328,
+                  "line": 325,
                   "column": 10
                 },
                 "end": {
-                  "line": 330,
+                  "line": 327,
                   "column": 11
                 }
               },
@@ -351,11 +351,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 332,
+                  "line": 329,
                   "column": 10
                 },
                 "end": {
-                  "line": 332,
+                  "line": 329,
                   "column": 38
                 }
               },
@@ -372,11 +372,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 334,
+                  "line": 331,
                   "column": 10
                 },
                 "end": {
-                  "line": 334,
+                  "line": 331,
                   "column": 30
                 }
               },
@@ -393,11 +393,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 336,
+                  "line": 333,
                   "column": 10
                 },
                 "end": {
-                  "line": 336,
+                  "line": 333,
                   "column": 28
                 }
               },
@@ -414,11 +414,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 338,
+                  "line": 335,
                   "column": 10
                 },
                 "end": {
-                  "line": 338,
+                  "line": 335,
                   "column": 27
                 }
               },
@@ -435,11 +435,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 340,
+                  "line": 337,
                   "column": 10
                 },
                 "end": {
-                  "line": 340,
+                  "line": 337,
                   "column": 30
                 }
               },
@@ -456,11 +456,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 342,
+                  "line": 339,
                   "column": 10
                 },
                 "end": {
-                  "line": 342,
+                  "line": 339,
                   "column": 35
                 }
               },
@@ -477,11 +477,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 344,
+                  "line": 341,
                   "column": 10
                 },
                 "end": {
-                  "line": 344,
+                  "line": 341,
                   "column": 30
                 }
               },
@@ -499,11 +499,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 377,
+                  "line": 374,
                   "column": 6
                 },
                 "end": {
-                  "line": 388,
+                  "line": 385,
                   "column": 7
                 }
               },
@@ -519,11 +519,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 390,
+                  "line": 387,
                   "column": 6
                 },
                 "end": {
-                  "line": 407,
+                  "line": 404,
                   "column": 7
                 }
               },
@@ -539,11 +539,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 409,
+                  "line": 406,
                   "column": 6
                 },
                 "end": {
-                  "line": 411,
+                  "line": 408,
                   "column": 7
                 }
               },
@@ -563,11 +563,11 @@
               "privacy": "public",
               "sourceRange": {
                 "start": {
-                  "line": 417,
+                  "line": 414,
                   "column": 6
                 },
                 "end": {
-                  "line": 423,
+                  "line": 420,
                   "column": 7
                 }
               },
@@ -587,11 +587,11 @@
               "privacy": "public",
               "sourceRange": {
                 "start": {
-                  "line": 425,
+                  "line": 422,
                   "column": 6
                 },
                 "end": {
-                  "line": 436,
+                  "line": 433,
                   "column": 7
                 }
               },
@@ -607,11 +607,11 @@
               "privacy": "public",
               "sourceRange": {
                 "start": {
-                  "line": 438,
+                  "line": 435,
                   "column": 6
                 },
                 "end": {
-                  "line": 454,
+                  "line": 451,
                   "column": 7
                 }
               },
@@ -627,11 +627,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 456,
+                  "line": 453,
                   "column": 6
                 },
                 "end": {
-                  "line": 458,
+                  "line": 455,
                   "column": 7
                 }
               },
@@ -651,11 +651,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 460,
+                  "line": 457,
                   "column": 6
                 },
                 "end": {
-                  "line": 462,
+                  "line": 459,
                   "column": 7
                 }
               },
@@ -675,11 +675,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 472,
+                  "line": 469,
                   "column": 6
                 },
                 "end": {
-                  "line": 489,
+                  "line": 486,
                   "column": 7
                 }
               },
@@ -699,11 +699,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 495,
+                  "line": 492,
                   "column": 6
                 },
                 "end": {
-                  "line": 516,
+                  "line": 513,
                   "column": 7
                 }
               },
@@ -723,11 +723,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 456,
+                  "line": 515,
                   "column": 6
                 },
                 "end": {
-                  "line": 458,
+                  "line": 517,
                   "column": 7
                 }
               },
@@ -743,11 +743,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 522,
+                  "line": 523,
                   "column": 6
                 },
                 "end": {
-                  "line": 542,
+                  "line": 547,
                   "column": 7
                 }
               },
@@ -767,11 +767,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 544,
+                  "line": 549,
                   "column": 6
                 },
                 "end": {
-                  "line": 557,
+                  "line": 562,
                   "column": 7
                 }
               },
@@ -787,11 +787,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 559,
+                  "line": 564,
                   "column": 6
                 },
                 "end": {
-                  "line": 563,
+                  "line": 568,
                   "column": 7
                 }
               },
@@ -807,11 +807,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 565,
+                  "line": 570,
                   "column": 6
                 },
                 "end": {
-                  "line": 581,
+                  "line": 586,
                   "column": 7
                 }
               },
@@ -827,11 +827,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 583,
+                  "line": 588,
                   "column": 6
                 },
                 "end": {
-                  "line": 594,
+                  "line": 599,
                   "column": 7
                 }
               },
@@ -847,11 +847,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 603,
+                  "line": 608,
                   "column": 6
                 },
                 "end": {
-                  "line": 611,
+                  "line": 616,
                   "column": 7
                 }
               },
@@ -871,11 +871,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 613,
+                  "line": 618,
                   "column": 6
                 },
                 "end": {
-                  "line": 625,
+                  "line": 630,
                   "column": 7
                 }
               },
@@ -891,11 +891,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 627,
+                  "line": 632,
                   "column": 6
                 },
                 "end": {
-                  "line": 638,
+                  "line": 643,
                   "column": 7
                 }
               },
@@ -911,11 +911,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 640,
+                  "line": 645,
                   "column": 6
                 },
                 "end": {
-                  "line": 664,
+                  "line": 669,
                   "column": 7
                 }
               },
@@ -926,16 +926,16 @@
               }
             },
             {
-              "name": "_templateChanged",
+              "name": "_stampOverlayTemplate",
               "description": "",
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 666,
+                  "line": 671,
                   "column": 6
                 },
                 "end": {
-                  "line": 737,
+                  "line": 742,
                   "column": 7
                 }
               },
@@ -958,11 +958,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 739,
+                  "line": 744,
                   "column": 6
                 },
                 "end": {
-                  "line": 745,
+                  "line": 750,
                   "column": 7
                 }
               },
@@ -991,11 +991,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 747,
+                  "line": 752,
                   "column": 6
                 },
                 "end": {
-                  "line": 777,
+                  "line": 782,
                   "column": 7
                 }
               },
@@ -1003,6 +1003,18 @@
               "params": [
                 {
                   "name": "template"
+                },
+                {
+                  "name": "renderer"
+                },
+                {
+                  "name": "owner"
+                },
+                {
+                  "name": "model"
+                },
+                {
+                  "name": "instanceProps"
                 }
               ],
               "return": {
@@ -1015,11 +1027,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 779,
+                  "line": 784,
                   "column": 6
                 },
                 "end": {
-                  "line": 781,
+                  "line": 786,
                   "column": 7
                 }
               },
@@ -1036,11 +1048,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 783,
+                  "line": 788,
                   "column": 6
                 },
                 "end": {
-                  "line": 786,
+                  "line": 791,
                   "column": 7
                 }
               },
@@ -1057,11 +1069,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 788,
+                  "line": 793,
                   "column": 6
                 },
                 "end": {
-                  "line": 806,
+                  "line": 811,
                   "column": 7
                 }
               },
@@ -1084,11 +1096,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 808,
+                  "line": 813,
                   "column": 6
                 },
                 "end": {
-                  "line": 811,
+                  "line": 816,
                   "column": 7
                 }
               },
@@ -1101,11 +1113,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 813,
+                  "line": 818,
                   "column": 6
                 },
                 "end": {
-                  "line": 817,
+                  "line": 822,
                   "column": 7
                 }
               },
@@ -1208,11 +1220,11 @@
           "metadata": {},
           "sourceRange": {
             "start": {
-              "line": 230,
+              "line": 227,
               "column": 4
             },
             "end": {
-              "line": 818,
+              "line": 823,
               "column": 5
             }
           },
@@ -1225,11 +1237,11 @@
               "description": "",
               "sourceRange": {
                 "start": {
-                  "line": 237,
+                  "line": 234,
                   "column": 10
                 },
                 "end": {
-                  "line": 241,
+                  "line": 238,
                   "column": 11
                 }
               },
@@ -1241,11 +1253,11 @@
               "description": "Owner element passed with renderer function",
               "sourceRange": {
                 "start": {
-                  "line": 246,
+                  "line": 243,
                   "column": 10
                 },
                 "end": {
-                  "line": 246,
+                  "line": 243,
                   "column": 24
                 }
               },
@@ -1257,11 +1269,11 @@
               "description": "Custom function for rendering the content of the overlay.\nReceives arguments `root`, `owner`, `model`\n\n`root` The root container element. Users are able to append content to it.\n\n`owner` The host element of the renderer function.\n\n`model` Object with properties that could be required during the rendering process.\n\n**NOTE:** The renderer callback can be called several times with previous content available",
               "sourceRange": {
                 "start": {
-                  "line": 260,
+                  "line": 257,
                   "column": 10
                 },
                 "end": {
-                  "line": 260,
+                  "line": 257,
                   "column": 28
                 }
               },
@@ -1273,11 +1285,11 @@
               "description": "The template of the overlay content.",
               "sourceRange": {
                 "start": {
-                  "line": 265,
+                  "line": 262,
                   "column": 10
                 },
                 "end": {
-                  "line": 268,
+                  "line": 265,
                   "column": 11
                 }
               },
@@ -1289,11 +1301,11 @@
               "description": "Optional argument for `Polymer.Templatize.templatize`.",
               "sourceRange": {
                 "start": {
-                  "line": 273,
+                  "line": 270,
                   "column": 10
                 },
                 "end": {
-                  "line": 275,
+                  "line": 272,
                   "column": 11
                 }
               },
@@ -1305,11 +1317,11 @@
               "description": "References the content container after the template is stamped.",
               "sourceRange": {
                 "start": {
-                  "line": 280,
+                  "line": 277,
                   "column": 10
                 },
                 "end": {
-                  "line": 283,
+                  "line": 280,
                   "column": 11
                 }
               },
@@ -1321,11 +1333,11 @@
               "description": "",
               "sourceRange": {
                 "start": {
-                  "line": 285,
+                  "line": 282,
                   "column": 10
                 },
                 "end": {
-                  "line": 289,
+                  "line": 286,
                   "column": 11
                 }
               },
@@ -1337,11 +1349,11 @@
               "description": "Object with properties that is passed to `renderer` function",
               "sourceRange": {
                 "start": {
-                  "line": 294,
+                  "line": 291,
                   "column": 10
                 },
                 "end": {
-                  "line": 294,
+                  "line": 291,
                   "column": 23
                 }
               },
@@ -1353,11 +1365,11 @@
               "description": "When true the overlay won't disable the main content, showing\nit doesn’t change the functionality of the user interface.",
               "sourceRange": {
                 "start": {
-                  "line": 300,
+                  "line": 297,
                   "column": 10
                 },
                 "end": {
-                  "line": 305,
+                  "line": 302,
                   "column": 11
                 }
               },
@@ -1369,11 +1381,11 @@
               "description": "When true move focus to the first focusable element in the overlay,\nor to the overlay if there are no focusable elements.",
               "sourceRange": {
                 "start": {
-                  "line": 311,
+                  "line": 308,
                   "column": 10
                 },
                 "end": {
-                  "line": 314,
+                  "line": 311,
                   "column": 11
                 }
               },
