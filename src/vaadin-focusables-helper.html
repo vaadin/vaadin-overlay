@@ -219,6 +219,25 @@
         const ati = Math.max(a.tabIndex, 0);
         const bti = Math.max(b.tabIndex, 0);
         return (ati === 0 || bti === 0) ? bti > ati : ati > bti;
+      },
+
+      /**
+       * The deepest active element.
+       * @return {!Element} activeElement the active element
+       */
+      get deepActiveElement() {
+        var active = document.activeElement;
+        // document.activeElement can be null
+        // https://developer.mozilla.org/en-US/docs/Web/API/Document/activeElement
+        // In IE 11, it can also be an object when operating in iframes.
+        // In these cases, default it to document.body.
+        if (!active || active instanceof Element === false) {
+          active = document.body;
+        }
+        while (active.shadowRoot && active.shadowRoot.activeElement) {
+          active = active.shadowRoot.activeElement;
+        }
+        return active;
       }
     };
 
