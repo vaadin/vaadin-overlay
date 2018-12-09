@@ -8,6 +8,7 @@ This program is available under Apache License Version 2.0, available at https:/
 <link rel="import" href="../../polymer/lib/utils/templatize.html">
 <link rel="import" href="../../polymer/lib/utils/render-status.html">
 <link rel="import" href="../../polymer/lib/utils/flattened-nodes-observer.html">
+<link rel="import" href="../../iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="../../vaadin-themable-mixin/vaadin-themable-mixin.html">
 <link rel="import" href="vaadin-focusables-helper.html">
 
@@ -189,6 +190,13 @@ This program is available under Apache License Version 2.0, available at https:/
      * every template can only be templatized once, so it is important
      * to set `instanceProps` before the `template` is assigned to the overlay.
      *
+     * ### Resize Notification
+     *
+     * This element implements `IronResizableBehavior` to notify the nested resizables
+     * when the overlay opens or closes. In order to define a resizable and receive that
+     * notification in a nested element, include `IronResizableBehavior` and listen
+     * for the `iron-resize` event.
+     *
      * ### Styling
      *
      * To style the overlay content, use styles in the parent scope:
@@ -227,7 +235,10 @@ This program is available under Apache License Version 2.0, available at https:/
      * @mixes Vaadin.ThemableMixin
      * @demo demo/index.html
      */
-    class OverlayElement extends Vaadin.ThemableMixin(Polymer.Element) {
+    class OverlayElement extends
+      Vaadin.ThemableMixin(
+        Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element)) {
+
       static get is() {
         return 'vaadin-overlay';
       }
@@ -571,6 +582,7 @@ This program is available under Apache License Version 2.0, available at https:/
         const finishOpening = () => {
           this.removeAttribute('opening');
           document.addEventListener('iron-overlay-canceled', this._boundIronOverlayCanceledListener);
+          this.notifyResize();
         };
 
         if (this._shouldAnimate()) {
@@ -597,6 +609,7 @@ This program is available under Apache License Version 2.0, available at https:/
             document.removeEventListener('iron-overlay-canceled', this._boundIronOverlayCanceledListener);
             this._detachOverlay();
             this.removeAttribute('closing');
+            this.notifyResize();
 
             if (this.restoreFocusOnClose && this.__restoreFocusNode) {
               // If the activeElement is `<body>` or inside the overlay,
@@ -913,6 +926,13 @@ This program is available under Apache License Version 2.0, available at https:/
         }
         return n === this;
       }
+
+      /**
+       * Fired when the overlay opens or closes. Non-bubbling. Fired for the overlay
+       * element and any nested elements with `IronResizableBehavior`.
+       *
+       * @event iron-resize
+       */
     }
 
     customElements.define(OverlayElement.is, OverlayElement);
