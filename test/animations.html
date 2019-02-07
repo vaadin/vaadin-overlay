@@ -76,7 +76,7 @@
 
       sinon.stub(overlay, '_enqueueAnimation', (type, callback) => {
         const handler = `__${type}Handler`;
-        overlay[handler] = Polymer.Debouncer.debounce(overlay[handler], Polymer.Async.timeOut, () => {
+        overlay[handler] = Polymer.Debouncer.debounce(overlay[handler], Polymer.Async.animationFrame, () => {
           callback();
         });
       });
@@ -86,6 +86,23 @@
         overlay[handler].flush();
       });
     }
+
+    const overlayOpen = el => {
+      const event = 'vaadin-overlay-open';
+      return new Promise(resolve => {
+        const onceOpen = () => {
+          el.removeEventListener(event, onceOpen);
+          resolve();
+        };
+        el.addEventListener(event, onceOpen);
+      });
+    };
+
+    const nextFrame = () => {
+      return new Promise(resolve => {
+        window.requestAnimationFrame(resolve);
+      });
+    };
 
     describe('animated overlay', () => {
       let overlay;
@@ -150,20 +167,19 @@
     describe('switching two overlays', () => {
       let wrapper, overlays;
 
-      beforeEach(done => {
+      beforeEach(async() => {
         wrapper = fixture('switching');
         overlays = Array.from(wrapper.shadowRoot.querySelectorAll('vaadin-overlay'));
         overlays.forEach(overlay => mockOverlayAnimations(overlay));
         overlays[0].opened = true;
-        Polymer.RenderStatus.afterNextRender(overlays[0], done);
+        await overlayOpen(overlays[0]);
       });
 
-      it('should remove pointer events on previously opened overlay', done => {
+      it('should remove pointer events on previously opened overlay', async() => {
         overlays[0].content.querySelector('button').click();
-        Polymer.RenderStatus.afterNextRender(overlays[1], () => {
-          expect(overlays[0].$.overlay.style.pointerEvents).to.equal('');
-          done();
-        });
+        await overlayOpen(overlays[1]);
+        await nextFrame();
+        expect(overlays[0].$.overlay.style.pointerEvents).to.equal('');
       });
     });
   </script>

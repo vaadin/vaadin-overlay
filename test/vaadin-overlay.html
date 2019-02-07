@@ -123,16 +123,28 @@
     const mousedown = (el) => fire('mousedown', el);
     const mouseup = (el) => fire('mouseup', el);
 
+    const overlayOpen = el => {
+      const event = 'vaadin-overlay-open';
+      return new Promise(resolve => {
+        const onceOpen = () => {
+          el.removeEventListener(event, onceOpen);
+          resolve();
+        };
+        el.addEventListener(event, onceOpen);
+      });
+    };
+
     describe('overlay', function() {
       var overlay, parent, overlayPart, backdrop;
 
-      beforeEach(function() {
+      beforeEach(async() => {
         parent = fixture('default').children[0];
         overlay = parent.children[0];
         overlayPart = overlay.$.overlay;
         backdrop = overlay.$.backdrop;
         overlay._observer.flush();
         overlay.opened = true;
+        await overlayOpen(overlay);
       });
 
       afterEach(function() {
@@ -164,11 +176,12 @@
         expect(overlay.parentElement).to.eql(parent);
       });
 
-      it('should focus the previously focused element before opening', () => {
+      it('should focus the previously focused element before opening', async() => {
         const button = fixture('default').children[1];
         overlay.opened = false;
         button.focus();
         overlay.opened = true;
+        await overlayOpen(overlay);
         overlay.opened = false;
 
         expect(document.activeElement).to.eql(button);
@@ -189,16 +202,16 @@
           expect(overlay1._last).to.be.true;
         });
 
-        it('should not be the last when another overlay is opened after this', () => {
-          overlay1.opened = true;
+        it('should not be the last when another overlay is opened after this', async() => {
           overlay2.opened = true;
+          await overlayOpen(overlay2);
           expect(overlay1._last).not.to.be.true;
           expect(overlay2._last).to.be.true;
         });
 
-        it('should become last when the last overlay is closed', () => {
-          overlay1.opened = true;
+        it('should become last when the last overlay is closed', async() => {
           overlay2.opened = true;
+          await overlayOpen(overlay2);
           overlay2.opened = false;
           expect(overlay1._last).to.be.true;
         });
@@ -211,11 +224,12 @@
           expect(spy).to.be.called.once;
         });
 
-        it('should not fire the vaadin-overlay-escape-press if there is a recent overlay opened', () => {
+        it('should not fire the vaadin-overlay-escape-press if there is a recent overlay opened', async() => {
           var spy = sinon.spy();
           overlay1.addEventListener('vaadin-overlay-escape-press', spy);
           overlay1.opened = true;
           overlay2.opened = true;
+          await overlayOpen(overlay2);
           MockInteractions.pressAndReleaseKeyOn(document.body, 27, [], 'Escape');
           expect(spy).not.to.be.called;
         });
@@ -228,18 +242,19 @@
           expect(spy).to.be.called.once;
         });
 
-        it('should not fire the vaadin-overlay-outside-click if there is a recent overlay opened', () => {
+        it('should not fire the vaadin-overlay-outside-click if there is a recent overlay opened', async() => {
           var spy = sinon.spy();
           overlay1.addEventListener('vaadin-overlay-outside-click', spy);
           overlay1.opened = true;
           overlay2.opened = true;
+          await overlayOpen(overlay2);
           click(parent);
           expect(spy).not.to.be.called;
         });
 
-        it('should restore correctly pointer events when overlays are not closed in order', () => {
-          overlay1.opened = true;
+        it('should restore correctly pointer events when overlays are not closed in order', async() => {
           overlay2.opened = true;
+          await overlayOpen(overlay2);
           expect(document.body.style.pointerEvents).to.eql('none');
 
           overlay1.opened = false;
@@ -247,30 +262,32 @@
           expect(document.body.style.pointerEvents).to.eql('');
         });
 
-        it('should disable pointer-events in first overlay when second opens', () => {
+        it('should disable pointer-events in first overlay when second opens', async() => {
           const overlay1Part = overlay1.shadowRoot.querySelector('[part="overlay"]');
           overlay1.opened = true;
           overlay2.opened = true;
-
+          await overlayOpen(overlay2);
           expect(getComputedStyle(overlay1Part).pointerEvents).to.equal('none');
         });
 
-        it('should restore pointer-events in first overlay when second closes', () => {
+        it('should restore pointer-events in first overlay when second closes', async() => {
           const overlay1Part = overlay1.shadowRoot.querySelector('[part="overlay"]');
-          overlay1.opened = true;
           overlay2.opened = true;
+          await overlayOpen(overlay2);
           overlay2.opened = false;
 
           expect(getComputedStyle(overlay1Part).pointerEvents).to.equal('auto');
         });
 
-        it('should restore pointer-events in second overlay when third closes', () => {
+        it('should restore pointer-events in second overlay when third closes', async() => {
           const overlay3 = fixture('empty').children[0].children[0];
           const overlay1Part = overlay1.shadowRoot.querySelector('[part="overlay"]');
           const overlay2Part = overlay2.shadowRoot.querySelector('[part="overlay"]');
           overlay1.opened = true;
           overlay2.opened = true;
+          await overlayOpen(overlay2);
           overlay3.opened = true;
+          await overlayOpen(overlay3);
           overlay3.opened = false;
 
           expect(getComputedStyle(overlay2Part).pointerEvents).to.equal('auto');
