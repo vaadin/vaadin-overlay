@@ -540,14 +540,11 @@ This program is available under Apache License Version 2.0, available at https:/
           });
 
           if (!this.modeless) {
-            this._addGlobalListeners();
+            this._enterModalState();
           }
         } else if (wasOpened) {
           this._animatedClosing();
-
-          if (!this.modeless) {
-            this._removeGlobalListeners();
-          }
+          this._exitModalState();
         }
       }
 
@@ -591,10 +588,6 @@ This program is available under Apache License Version 2.0, available at https:/
         const finishOpening = () => {
           this.removeAttribute('opening');
           document.addEventListener('iron-overlay-canceled', this._boundIronOverlayCanceledListener);
-
-          if (!this.modeless) {
-            this._enterModalState();
-          }
         };
 
         if (this._shouldAnimate()) {
@@ -619,8 +612,6 @@ This program is available under Apache License Version 2.0, available at https:/
 
           const finishClosing = () => {
             this.shadowRoot.querySelector('[part="overlay"]').style.removeProperty('pointer-events');
-
-            this._exitModalState();
 
             document.removeEventListener('iron-overlay-canceled', this._boundIronOverlayCanceledListener);
             this._detachOverlay();
@@ -671,23 +662,19 @@ This program is available under Apache License Version 2.0, available at https:/
       _modelessChanged(modeless) {
         if (!modeless) {
           if (this.opened) {
-            this._addGlobalListeners();
             this._enterModalState();
           }
         } else {
-          this._removeGlobalListeners();
           this._exitModalState();
         }
       }
 
-      _addGlobalListeners() {
+      _enterModalState() {
         document.addEventListener('mousedown', this._boundMouseDownListener);
         document.addEventListener('mouseup', this._boundMouseUpListener);
         document.addEventListener('click', this._boundOutsideClickListener, true);
         document.addEventListener('keydown', this._boundKeydownListener);
-      }
 
-      _enterModalState() {
         if (document.body.style.pointerEvents !== 'none') {
           // Set body pointer-events to 'none' to disable mouse interactions with
           // other document nodes.
@@ -703,14 +690,12 @@ This program is available under Apache License Version 2.0, available at https:/
         });
       }
 
-      _removeGlobalListeners() {
+      _exitModalState() {
         document.removeEventListener('mousedown', this._boundMouseDownListener);
         document.removeEventListener('mouseup', this._boundMouseUpListener);
         document.removeEventListener('click', this._boundOutsideClickListener, true);
         document.removeEventListener('keydown', this._boundKeydownListener);
-      }
 
-      _exitModalState() {
         if (this._previousDocumentPointerEvents !== undefined) {
           // Restore body pointer-events
           document.body.style.pointerEvents = this._previousDocumentPointerEvents;
