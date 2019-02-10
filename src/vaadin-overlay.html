@@ -313,6 +313,16 @@ This program is available under Apache License Version 2.0, available at https:/
           },
 
           /**
+           * When set to true, the overlay is hidden. This also closes the overlay
+           * immediately in case there is a closing animation in progress.
+           */
+          hidden: {
+            type: Boolean,
+            reflectToAttribute: true,
+            observer: '_hiddenChanged'
+          },
+
+          /**
            * When true move focus to the first focusable element in the overlay,
            * or to the overlay if there are no focusable elements.
            */
@@ -541,17 +551,27 @@ This program is available under Apache License Version 2.0, available at https:/
           });
 
           if (!this.modeless) {
-            this._enterModalState();
+            this._addGlobalListeners();
           }
         } else if (wasOpened) {
           this._animatedClosing();
-          this._exitModalState();
+
+          if (!this.modeless) {
+            this._removeGlobalListeners();
+          }
+        }
+      }
+
+      _hiddenChanged(hidden) {
+        if (hidden && this.hasAttribute('closing')) {
+          this._flushAnimation('closing');
         }
       }
 
       _shouldAnimate() {
         const name = getComputedStyle(this).getPropertyValue('animation-name');
-        return name && name != 'none';
+        const hidden = getComputedStyle(this).getPropertyValue('display') === 'none';
+        return !hidden && name && name != 'none';
       }
 
       _enqueueAnimation(type, callback) {
@@ -582,6 +602,11 @@ This program is available under Apache License Version 2.0, available at https:/
         const finishOpening = () => {
           this.removeAttribute('opening');
           document.addEventListener('iron-overlay-canceled', this._boundIronOverlayCanceledListener);
+
+          if (!this.modeless) {
+            this._enterModalState();
+          }
+
           this.notifyResize();
         };
 
@@ -606,6 +631,10 @@ This program is available under Apache License Version 2.0, available at https:/
           this.setAttribute('closing', '');
 
           const finishClosing = () => {
+            this.shadowRoot.querySelector('[part="overlay"]').style.removeProperty('pointer-events');
+
+            this._exitModalState();
+
             document.removeEventListener('iron-overlay-canceled', this._boundIronOverlayCanceledListener);
             this._detachOverlay();
             this.removeAttribute('closing');
@@ -656,19 +685,25 @@ This program is available under Apache License Version 2.0, available at https:/
       _modelessChanged(modeless) {
         if (!modeless) {
           if (this.opened) {
+            this._addGlobalListeners();
             this._enterModalState();
           }
         } else {
+          this._removeGlobalListeners();
           this._exitModalState();
         }
       }
 
-      _enterModalState() {
+      _addGlobalListeners() {
         document.addEventListener('mousedown', this._boundMouseDownListener);
         document.addEventListener('mouseup', this._boundMouseUpListener);
-        document.addEventListener('click', this._boundOutsideClickListener, true);
+        // Firefox leaks click to document on contextmenu even if prevented
+        // https://bugzilla.mozilla.org/show_bug.cgi?id=990614
+        document.documentElement.addEventListener('click', this._boundOutsideClickListener, true);
         document.addEventListener('keydown', this._boundKeydownListener);
+      }
 
+      _enterModalState() {
         if (document.body.style.pointerEvents !== 'none') {
           // Set body pointer-events to 'none' to disable mouse interactions with
           // other document nodes.
@@ -684,12 +719,14 @@ This program is available under Apache License Version 2.0, available at https:/
         });
       }
 
-      _exitModalState() {
+      _removeGlobalListeners() {
         document.removeEventListener('mousedown', this._boundMouseDownListener);
         document.removeEventListener('mouseup', this._boundMouseUpListener);
-        document.removeEventListener('click', this._boundOutsideClickListener, true);
+        document.documentElement.removeEventListener('click', this._boundOutsideClickListener, true);
         document.removeEventListener('keydown', this._boundKeydownListener);
+      }
 
+      _exitModalState() {
         if (this._previousDocumentPointerEvents !== undefined) {
           // Restore body pointer-events
           document.body.style.pointerEvents = this._previousDocumentPointerEvents;
