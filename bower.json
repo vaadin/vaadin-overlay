@@ -33,8 +33,11 @@
     "iron-component-page": "^3.0.0",
     "iron-demo-helpers": "^2.0.0",
     "iron-test-helpers": "^2.0.0",
-    "vaadin-button": "^2.0.0",
-    "vaadin-text-field": "^2.0.0",
+    "vaadin-button": "vaadin-10",
+    "vaadin-text-field": "vaadin-10",
+    "vaadin-element-mixin": "~1.0.0",
+    "vaadin-development-mode-detector": "~1.0.0",
+    "vaadin-usage-statistics": "~1.0.0",
     "iron-form": "^2.0.0",
     "iron-input": "^2.0.0",
     "paper-button": "^2.0.0",
@@ -49,6 +52,11 @@
     "web-component-tester": "^6.0.0"
   },
   "resolutions": {
+    "vaadin-element-mixin": "1.0.2",
+    "vaadin-development-mode-detector": "1.0.3",
+    "vaadin-usage-statistics": "1.0.8",
+    "vaadin-button": "vaadin-10",
+    "vaadin-text-field": "vaadin-10",
     "vaadin-item": "vaadin-10"
   }
 }
