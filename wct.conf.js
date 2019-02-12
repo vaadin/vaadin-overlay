@@ -1,4 +1,5 @@
-var argv = require('yargs').argv;
+var envIndex = process.argv.indexOf('--env') + 1;
+var env = envIndex ? process.argv[envIndex] : undefined;
 
 module.exports = {
   testTimeout: 180 * 1000,
@@ -28,7 +29,7 @@ module.exports = {
       'Windows 10/firefox@latest'
     ];
 
-    switch (argv.env) {
+    switch (env) {
       case 'saucelabs:mobile':
         context.options.plugins.sauce.browsers = saucelabsPlatformsMobile;
         break;
