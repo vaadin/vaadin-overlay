@@ -825,6 +825,11 @@ This program is available under Apache License Version 2.0, available at https:/
               contentPart.className = this.$.content.className;
               this._originalContentPart = this.$.content;
               this.$.content = contentPart;
+
+              // generated custom element might not have shadowRoot attached
+              if (!this.$.content.shadowRoot) {
+                this.$.content.attachShadow({mode: 'open'});
+              }
             } else {
               // Shadow DOM: append a style to the content shadowRoot
               const style = document.createElement('style');
