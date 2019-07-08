@@ -27,6 +27,7 @@
           const target = document.querySelector('#positionTarget');
 
           positionOverlay.positionTarget = target;
+          target.addEventListener('click', e => positionOverlay.opened = !positionOverlay.opened);
 
           const createToggleButton = function(prop, val1, val2) {
             let btn = document.createElement('button');
@@ -58,6 +59,9 @@
           }
 
           positionOverlay.renderer = function(root) {
+            if (root.firstElementChild) {
+              return;
+            }
             root.appendChild(createToggleButton('horizontalAlign', 'start', 'end'));
             root.appendChild(createToggleButton('verticalAlign', 'top', 'bottom'));
             root.appendChild(document.createElement('br'));

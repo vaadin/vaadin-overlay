@@ -59,6 +59,17 @@ This program is available under Apache License Version 2.0, available at https:/
         horizontalOverlap, verticalOverlap, horizontalOffset, verticalOffset)`];
     }
 
+    connectedCallback() {
+      super.connectedCallback();
+      const boundUpdatePosition = this.updatePosition.bind(this);
+
+      this.addEventListener('opened-changed', e => {
+        const func = e.detail.value ? 'addEventListener' : 'removeEventListener';
+        window[func]('scroll', boundUpdatePosition);
+        window[func]('resize', boundUpdatePosition);
+      });
+    }
+
     _positionSettingsChanged() {
       this.updatePosition();
     }
