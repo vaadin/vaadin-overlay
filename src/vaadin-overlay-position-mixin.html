@@ -71,35 +71,35 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     _positionSettingsChanged() {
-      this.updatePosition();
+      setTimeout(() => this.updatePosition());
     }
 
     updatePosition() {
       if (!this.positionTarget) {
         return;
       }
-      const targetRect = this.positionTarget.getBoundingClientRect();
-      const ltr = getComputedStyle(this).direction === 'ltr';
-      const leftAlign = (ltr && this.horizontalAlign === 'start')
-        || (!ltr && this.horizontalAlign === 'end');
-      const horAlignProp = leftAlign ? 'left' : 'right';
+      this.setAttribute('_horizontal-align', this.getAttribute('horizontal-align'));
+      this.setAttribute('_vertical-align', this.getAttribute('vertical-align'));
 
-      let x = this.horizontalOffset || 0;
-      if (horAlignProp === 'left') {
-        this.style.removeProperty('right');
-        x += targetRect.left;
-      } else {
-        this.style.removeProperty('left');
-        const viewportWidth = Math.min(window.innerWidth, document.documentElement.clientWidth);
-        x += viewportWidth - targetRect.right;
+      const targetRect = this.positionTarget.getBoundingClientRect();
+
+      const ltr = getComputedStyle(this).direction === 'ltr';
+      let leftAlign = (ltr && this.horizontalAlign === 'start')
+        || (!ltr && this.horizontalAlign === 'end');
+
+      let horAlignProp = leftAlign ? 'left' : 'right';
+      let x = this.__getX(horAlignProp, targetRect);
+
+      // Switch sides if not fitting and other side has more space (currently works only for left-aligned)
+      if (targetRect.left + targetRect.width / 2 > this._viewportWidth / 2 && this.$.overlay.clientWidth >= this.clientWidth) {
+        this._toggleHorizontalAlignAttribute();
+        leftAlign = !leftAlign;
+        horAlignProp = leftAlign ? 'left' : 'right';
+        x = this.__getX(horAlignProp, targetRect);
       }
-      if (!this.horizontalOverlap) {
-        x += targetRect.width;
-      }
-      this.style[horAlignProp] = x + 'px';
 
       let y = this.verticalOffset || 0;
-      if (this.verticalAlign === 'top'){
+      if (this.verticalAlign === 'top') {
         this.style.removeProperty('bottom');
         y += targetRect.top;
       } else {
@@ -111,6 +111,34 @@ This program is available under Apache License Version 2.0, available at https:/
         y += targetRect.height;
       }
       this.style[this.verticalAlign] = y + 'px';
+    }
+
+    __getX(horAlignProp, targetRect) {
+      let x = this.horizontalOffset || 0;
+      if (horAlignProp === 'left') {
+        this.style.removeProperty('right');
+        x += targetRect.left;
+      } else {
+        this.style.removeProperty('left');
+        x += this._viewportWidth - targetRect.right;
+      }
+      if (!this.horizontalOverlap) {
+        x += targetRect.width;
+      }
+      this.style[horAlignProp] = x + 'px';
+      return x;
+    }
+
+    get _viewportWidth() {
+      return Math.min(window.innerWidth, document.documentElement.clientWidth);
+    }
+
+    _toggleHorizontalAlignAttribute() {
+      if (this.getAttribute('_horizontal-align') === 'start') {
+        this.setAttribute('_horizontal-align', 'end');
+      } else {
+        this.setAttribute('_horizontal-align', 'start');
+      }
     }
   };
 </script>
