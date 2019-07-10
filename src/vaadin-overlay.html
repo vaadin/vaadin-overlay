@@ -813,6 +813,8 @@ This program is available under Apache License Version 2.0, available at https:/
           // The overlay root’s :host styles should not apply inside the overlay
           scopeCssText = scopeCssText.replace(/:host/g, ':host-nomatch');
 
+          let customElementDefined = Promise.resolve();
+
           if (scopeCssText) {
             if (isShady) {
               // ShadyDOM: replace the <div part="content"> with a generated
@@ -826,10 +828,8 @@ This program is available under Apache License Version 2.0, available at https:/
               this._originalContentPart = this.$.content;
               this.$.content = contentPart;
 
-              // generated custom element might not have shadowRoot attached
-              if (!this.$.content.shadowRoot) {
-                this.$.content.attachShadow({mode: 'open'});
-              }
+              // wait until the new element is defined
+              customElementDefined = customElements.whenDefined(contentPart.localName);
             } else {
               // Shadow DOM: append a style to the content shadowRoot
               const style = document.createElement('style');
@@ -839,8 +839,10 @@ This program is available under Apache License Version 2.0, available at https:/
             }
           }
 
-          this.$.content.shadowRoot.appendChild(this._instance.root);
-          this.content = this.$.content.shadowRoot;
+          customElementDefined.then(() => {
+            this.$.content.shadowRoot.appendChild(this._instance.root);
+            this.content = this.$.content.shadowRoot;
+          });
         } else {
           this.appendChild(this._instance.root);
           this.content = this;
