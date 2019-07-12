@@ -813,8 +813,6 @@ This program is available under Apache License Version 2.0, available at https:/
           // The overlay root’s :host styles should not apply inside the overlay
           scopeCssText = scopeCssText.replace(/:host/g, ':host-nomatch');
 
-          let customElementDefined = Promise.resolve();
-
           if (scopeCssText) {
             if (isShady) {
               // ShadyDOM: replace the <div part="content"> with a generated
@@ -827,9 +825,6 @@ This program is available under Apache License Version 2.0, available at https:/
               contentPart.className = this.$.content.className;
               this._originalContentPart = this.$.content;
               this.$.content = contentPart;
-
-              // wait until the new element is defined
-              customElementDefined = customElements.whenDefined(contentPart.localName);
             } else {
               // Shadow DOM: append a style to the content shadowRoot
               const style = document.createElement('style');
@@ -839,14 +834,23 @@ This program is available under Apache License Version 2.0, available at https:/
             }
           }
 
-          customElementDefined.then(() => {
-            this.$.content.shadowRoot.appendChild(this._instance.root);
-            this.content = this.$.content.shadowRoot;
-          });
+          if (this.$.content.shadowRoot) {  
+            _appendInstanceToShadowRoot();
+          } else {
+            // wait until the new element is defined
+            customElements.whenDefined(this.$.content.localName).then(() => {
+              _appendInstanceToShadowRoot();
+            });
+          }
         } else {
           this.appendChild(this._instance.root);
           this.content = this;
         }
+      }
+
+      _appendInstanceToShadowRoot() {
+        this.$.content.shadowRoot.appendChild(this._instance.root);
+        this.content = this.$.content.shadowRoot;
       }
 
       _removeNewRendererOrTemplate(template, oldTemplate, renderer, oldRenderer) {
