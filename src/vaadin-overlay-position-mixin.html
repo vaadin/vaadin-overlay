@@ -68,45 +68,45 @@ This program is available under Apache License Version 2.0, available at https:/
         return;
       }
       const targetRect = this.positionTarget.getBoundingClientRect();
-      const overlayRect = this.getBoundingClientRect();
-      const contentRect = this.$.content.getBoundingClientRect();
 
       const rtl = getComputedStyle(this).direction === 'rtl';
 
-      const horizontalPosition = this.__calculateHorizontalPosition(overlayRect, contentRect, targetRect, rtl);
-      const verticalPosition = this.__calculateVerticalPosition(overlayRect, contentRect, targetRect, this._viewportHeight);
+      const horizontalPosition = this.__calculateHorizontalPosition(targetRect, rtl);
+      const verticalPosition = this.__calculateVerticalPosition(targetRect);
 
       const props = Object.fromEntries([horizontalPosition, verticalPosition]);
       this.__doSetPosition(props, rtl);
     }
 
-    __calculateHorizontalPosition(overlayRect, contentRect, targetRect, rtl) {
+    __calculateHorizontalPosition(targetRect, rtl) {
       const propNames = {
         start: 'left',
-        end: 'right',
-        size: 'width'
+        end: 'right'
       };
+      const overlayWidth = this.clientWidth;
+      const contentWidth = this.$.content.clientWidth;
       const viewportWidth = Math.min(window.innerWidth, document.documentElement.clientWidth);
       const defaultAlignLeft = (!rtl && this.horizontalAlign === 'start') || (rtl && this.horizontalAlign === 'end');
       const currentAlignLeft = !!this.style.left;
-      return this.__calculatePositionInOneDimension(overlayRect, contentRect, targetRect,
+      return this.__calculatePositionInOneDimension(targetRect, overlayWidth, contentWidth,
         viewportWidth, defaultAlignLeft, currentAlignLeft, this.horizontalOverlap, propNames);
     }
 
-    __calculateVerticalPosition(overlayRect, contentRect, targetRect) {
+    __calculateVerticalPosition(targetRect) {
       const propNames = {
         start: 'top',
-        end: 'bottom',
-        size: 'height'
+        end: 'bottom'
       };
+      const overlayHeight = this.clientHeight;
+      const contentHeight = this.$.content.clientHeight;
       const viewportHeight = Math.min(window.innerHeight, document.documentElement.clientHeight);
       const defaultAlignTop = this.verticalAlign === 'top';
       const currentAlignTop = !!this.style.top;
-      return this.__calculatePositionInOneDimension(overlayRect, contentRect, targetRect,
+      return this.__calculatePositionInOneDimension(targetRect, overlayHeight, contentHeight,
         viewportHeight, defaultAlignTop, currentAlignTop, this.verticalOverlap, propNames);
     }
 
-    __calculatePositionInOneDimension(overlayRect, contentRect, targetRect, viewportSize, defaultAlignStart, currentAlignStart, overlap, propNames) {
+    __calculatePositionInOneDimension(targetRect, overlaySize, contentSize, viewportSize, defaultAlignStart, currentAlignStart, overlap, propNames) {
       const spaceForStartAlignment = viewportSize - targetRect[overlap ? propNames.start : propNames.end];
       const spaceForEndAlignment = targetRect[overlap ? propNames.end : propNames.start];
 
@@ -115,7 +115,7 @@ This program is available under Apache License Version 2.0, available at https:/
 
       const currentlyOnDefaultSide = currentAlignStart === defaultAlignStart;
 
-      const shouldGoToDefaultSide = this.__shouldGoToDefaultSide(currentlyOnDefaultSide, overlayRect[propNames.size], contentRect[propNames.size], spaceForDefaultAlignment, spaceForOtherAlignment);
+      const shouldGoToDefaultSide = this.__shouldGoToDefaultSide(currentlyOnDefaultSide, overlaySize, contentSize, spaceForDefaultAlignment, spaceForOtherAlignment);
 
       const shouldAlignStart = (shouldGoToDefaultSide && defaultAlignStart) || (!shouldGoToDefaultSide && !defaultAlignStart);
 
