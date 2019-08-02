@@ -53,20 +53,6 @@ This program is available under Apache License Version 2.0, available at https:/
         --vaadin-overlay-viewport-bottom: 0;
       }
 
-      :host([_horizontal-align="start"]) {
-        align-items: flex-start;
-      }
-      :host([_horizontal-align="end"]) {
-        align-items: flex-end;
-      }
-
-      :host([_vertical-align="top"]) {
-        justify-content: flex-start;
-      }
-      :host([_vertical-align="bottom"]) {
-        justify-content: flex-end;
-      }
-
       :host([hidden]),
       :host(:not([opened]):not([closing])) {
         display: none !important;

@@ -21,7 +21,7 @@
     <demo-snippet>
       <template>
         <vaadin-overlay id="positionOverlay" opened modeless></vaadin-overlay>
-        <div id="positionTarget" style="border:1px solid;width:100px; height:100px;margin:200px;margin-left:400px;">target</div>
+        <div id="positionTarget" style="border:1px solid;width:100px; height:100px;margin:1200px;margin-left:400px;">target</div>
         <script>
           const positionOverlay = document.querySelector('#positionOverlay');
           const target = document.querySelector('#positionTarget');
@@ -62,13 +62,15 @@
             if (root.firstElementChild) {
               return;
             }
-            root.appendChild(createToggleButton('horizontalAlign', 'start', 'end'));
-            root.appendChild(createToggleButton('verticalAlign', 'top', 'bottom'));
-            root.appendChild(document.createElement('br'));
-            root.appendChild(createToggleButton('horizontalOverlap', true, false));
-            root.appendChild(createToggleButton('verticalOverlap', true, false));
-            root.appendChild(createSlider('horizontalOffset'));
-            root.appendChild(createSlider('verticalOffset'));
+            const div = document.createElement('div');
+            root.appendChild(div);
+            div.appendChild(createToggleButton('horizontalAlign', 'start', 'end'));
+            div.appendChild(createToggleButton('verticalAlign', 'top', 'bottom'));
+            div.appendChild(document.createElement('br'));
+            div.appendChild(createToggleButton('horizontalOverlap', true, false));
+            div.appendChild(createToggleButton('verticalOverlap', true, false));
+
+            div.style.width = div.style.height = '200px';
           };
         </script>
       </template>
