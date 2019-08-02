@@ -31,12 +31,12 @@ This program is available under Apache License Version 2.0, available at https:/
           reflectToAttribute: true
         },
 
-        horizontalOverlap: {
+        noHorizontalOverlap: {
           type: Boolean,
           value: false,
           reflectToAttribute: true
         },
-        verticalOverlap: {
+        noVerticalOverlap: {
           type: Boolean,
           value: false,
           reflectToAttribute: true
@@ -45,7 +45,7 @@ This program is available under Apache License Version 2.0, available at https:/
     }
     static get observers() {
       return [`_positionSettingsChanged(positionTarget, horizontalAlign, verticalAlign,
-        horizontalOverlap, verticalOverlap)`];
+        noHorizontalOverlap, noVerticalOverlap)`];
     }
 
     connectedCallback() {
@@ -89,7 +89,7 @@ This program is available under Apache License Version 2.0, available at https:/
       const defaultAlignLeft = (!rtl && this.horizontalAlign === 'start') || (rtl && this.horizontalAlign === 'end');
       const currentAlignLeft = !!this.style.left;
       return this.__calculatePositionInOneDimension(targetRect, overlayWidth, contentWidth,
-        viewportWidth, defaultAlignLeft, currentAlignLeft, this.horizontalOverlap, propNames);
+        viewportWidth, defaultAlignLeft, currentAlignLeft, this.noHorizontalOverlap, propNames);
     }
 
     __calculateVerticalPosition(targetRect) {
@@ -103,12 +103,12 @@ This program is available under Apache License Version 2.0, available at https:/
       const defaultAlignTop = this.verticalAlign === 'top';
       const currentAlignTop = !!this.style.top;
       return this.__calculatePositionInOneDimension(targetRect, overlayHeight, contentHeight,
-        viewportHeight, defaultAlignTop, currentAlignTop, this.verticalOverlap, propNames);
+        viewportHeight, defaultAlignTop, currentAlignTop, this.noVerticalOverlap, propNames);
     }
 
-    __calculatePositionInOneDimension(targetRect, overlaySize, contentSize, viewportSize, defaultAlignStart, currentAlignStart, overlap, propNames) {
-      const spaceForStartAlignment = viewportSize - targetRect[overlap ? propNames.start : propNames.end];
-      const spaceForEndAlignment = targetRect[overlap ? propNames.end : propNames.start];
+    __calculatePositionInOneDimension(targetRect, overlaySize, contentSize, viewportSize, defaultAlignStart, currentAlignStart, noOverlap, propNames) {
+      const spaceForStartAlignment = viewportSize - targetRect[noOverlap ? propNames.end : propNames.start];
+      const spaceForEndAlignment = targetRect[noOverlap ? propNames.start : propNames.end];
 
       const spaceForDefaultAlignment = defaultAlignStart ? spaceForStartAlignment : spaceForEndAlignment;
       const spaceForOtherAlignment = defaultAlignStart ? spaceForEndAlignment : spaceForStartAlignment;
@@ -121,11 +121,11 @@ This program is available under Apache License Version 2.0, available at https:/
 
       if (shouldAlignStart) {
         const cssPropName = propNames.start;
-        const cssPropValue = targetRect[overlap ? propNames.start : propNames.end];
+        const cssPropValue = targetRect[noOverlap ? propNames.end : propNames.start];
         return [cssPropName, cssPropValue];
       } else {
         const cssPropName = propNames.end;
-        const cssPropValue = viewportSize - (targetRect[overlap ? propNames.end : propNames.start]);
+        const cssPropValue = viewportSize - (targetRect[noOverlap ? propNames.start : propNames.end]);
         return [cssPropName, cssPropValue];
       }
     }
