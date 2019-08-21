@@ -834,23 +834,12 @@ This program is available under Apache License Version 2.0, available at https:/
             }
           }
 
-          if (this.$.content.shadowRoot) {  
-            _appendInstanceToShadowRoot();
-          } else {
-            // wait until the new element is defined
-            customElements.whenDefined(this.$.content.localName).then(() => {
-              _appendInstanceToShadowRoot();
-            });
-          }
+          this.$.content.shadowRoot.appendChild(this._instance.root);
+          this.content = this.$.content.shadowRoot;
         } else {
           this.appendChild(this._instance.root);
           this.content = this;
         }
-      }
-
-      _appendInstanceToShadowRoot() {
-        this.$.content.shadowRoot.appendChild(this._instance.root);
-        this.content = this.$.content.shadowRoot;
       }
 
       _removeNewRendererOrTemplate(template, oldTemplate, renderer, oldRenderer) {
