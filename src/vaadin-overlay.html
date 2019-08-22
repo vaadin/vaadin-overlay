@@ -123,8 +123,8 @@ This program is available under Apache License Version 2.0, available at https:/
         }
 
         constructor() {
-          super.connectedCallback();
-          
+          super();
+
           if (window.ShadyCSS) {
             window.ShadyCSS.styleElement(this);
           }
