@@ -44,15 +44,10 @@ This program is available under Apache License Version 2.0, available at https:/
         noHorizontalOverlap, noVerticalOverlap)`];
     }
 
-    connectedCallback() {
-      super.connectedCallback();
-      const boundUpdatePosition = this._updatePosition.bind(this);
+    constructor() {
+      super();
 
-      const computedStyle = getComputedStyle(this);
-      this.__margins = {};
-      ['top', 'bottom', 'left', 'right'].forEach(propName => {
-        this.__margins[propName] = parseInt(computedStyle[propName], 10);
-      });
+      const boundUpdatePosition = this._updatePosition.bind(this);
 
       this.addEventListener('opened-changed', e => {
         const func = e.detail.value ? 'addEventListener' : 'removeEventListener';
@@ -62,13 +57,21 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     __positionSettingsChanged() {
-      setTimeout(() => this._updatePosition());
+      this._updatePosition();
     }
 
     _updatePosition() {
       if (!this.positionTarget) {
         return;
       }
+      if (!this.__margins) {
+        const computedStyle = getComputedStyle(this);
+        this.__margins = {};
+        ['top', 'bottom', 'left', 'right'].forEach(propName => {
+          this.__margins[propName] = parseInt(computedStyle[propName], 10);
+        });
+      }
+
       const targetRect = this.positionTarget.getBoundingClientRect();
 
       const rtl = getComputedStyle(this).direction === 'rtl';
