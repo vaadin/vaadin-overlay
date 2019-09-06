@@ -137,7 +137,7 @@ This program is available under Apache License Version 2.0, available at https:/
       if (spaceOnDefaultSide > spaceOnOtherSide) {
         return true;
       }
-      const fitsOnCurrentSide = contentSize < (currentlyOnDefaultSide ? spaceOnDefaultSide : spaceOnOtherSide);
+      const fitsOnCurrentSide = contentSize < (currentlyOnDefaultSide ? spaceOnDefaultSide : spaceOnOtherSide) - 1;
       if (currentlyOnDefaultSide) {
         return fitsOnCurrentSide;
       }
