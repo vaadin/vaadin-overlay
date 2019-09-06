@@ -88,7 +88,7 @@ This program is available under Apache License Version 2.0, available at https:/
         start: 'left',
         end: 'right'
       };
-      const contentWidth = this.$.overlay.clientWidth;
+      const contentWidth = this.$.overlay.offsetWidth;
       const viewportWidth = Math.min(window.innerWidth, document.documentElement.clientWidth);
       const defaultAlignLeft = (!rtl && this.horizontalAlign === 'start') || (rtl && this.horizontalAlign === 'end');
       const currentAlignLeft = !!this.style.left;
@@ -101,7 +101,7 @@ This program is available under Apache License Version 2.0, available at https:/
         start: 'top',
         end: 'bottom'
       };
-      const contentHeight = this.$.overlay.clientHeight;
+      const contentHeight = this.$.overlay.offsetHeight;
       const viewportHeight = Math.min(window.innerHeight, document.documentElement.clientHeight);
       const defaultAlignTop = this.verticalAlign === 'top';
       const currentAlignTop = !!this.style.top;
