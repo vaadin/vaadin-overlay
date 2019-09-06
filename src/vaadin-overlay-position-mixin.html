@@ -53,6 +53,10 @@ This program is available under Apache License Version 2.0, available at https:/
         const func = e.detail.value ? 'addEventListener' : 'removeEventListener';
         window[func]('scroll', boundUpdatePosition);
         window[func]('resize', boundUpdatePosition);
+
+        if (e.detail.value) {
+          this._updatePosition();
+        }
       });
     }
 
