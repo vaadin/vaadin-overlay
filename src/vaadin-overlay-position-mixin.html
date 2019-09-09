@@ -15,24 +15,56 @@ This program is available under Apache License Version 2.0, available at https:/
 
     static get properties() {
       return {
+
+        /**
+         * The element next to which this overlay should be aligned.
+         * The position of the overlay relative to the positionTarget can be adjusted
+         * with properties `horizontalAlign`, `verticalAlign`, `noHorizontalOverlap`
+         * and `noVerticalOverlap`.
+         */
         positionTarget: {
           type: Object,
           value: null
         },
 
+        /**
+         * When `positionTarget` is set, this property defines whether to align the overlay's
+         * left or right side to the target element by default.
+         * Possible values are `start` and `end`.
+         * RTL is taken into account when interpreting the value.
+         * The overlay is automatically flipped to the opposite side when it doesn't fit into
+         * the default side defined by this property.
+         */
         horizontalAlign: {
           type: String,
           value: 'start'
         },
+
+        /**
+         * When `positionTarget` is set, this property defines whether to align the overlay's
+         * top or bottom side to the target element by default.
+         * Possible values are `top` and `bottom`.
+         * The overlay is automatically flipped to the opposite side when it doesn't fit into
+         * the default side defined by this property.
+         */
         verticalAlign: {
           type: String,
           value: 'top'
         },
 
+        /**
+         * When `positionTarget` is set, this property defines whether the overlay should overlap
+         * the target element in the x-axis, or be positioned right next to it.
+         */
         noHorizontalOverlap: {
           type: Boolean,
           value: false
         },
+
+        /**
+         * When `positionTarget` is set, this property defines whether the overlay should overlap
+         * the target element in the y-axis, or be positioned right above/below it.
+         */
         noVerticalOverlap: {
           type: Boolean,
           value: false
