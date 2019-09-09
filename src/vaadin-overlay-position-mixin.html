@@ -145,7 +145,9 @@ This program is available under Apache License Version 2.0, available at https:/
         viewportHeight, this.__margins, defaultAlignTop, currentAlignTop, this.noVerticalOverlap, propNames);
     }
 
-    static __calculatePositionInOneDimension(targetRect, contentSize, viewportSize, margins, defaultAlignStart, currentAlignStart, noOverlap, propNames) {
+    static __calculatePositionInOneDimension(targetRect, contentSize, viewportSize, margins,
+      defaultAlignStart, currentAlignStart, noOverlap, propNames) {
+
       const spaceForStartAlignment = viewportSize - targetRect[noOverlap ? propNames.end : propNames.start] - margins[propNames.end];
       const spaceForEndAlignment = targetRect[noOverlap ? propNames.start : propNames.end] - margins[propNames.start];
 
@@ -154,7 +156,8 @@ This program is available under Apache License Version 2.0, available at https:/
 
       const currentlyOnDefaultSide = currentAlignStart === defaultAlignStart;
 
-      const shouldGoToDefaultSide = this.__shouldGoToDefaultSide(currentlyOnDefaultSide, contentSize, spaceForDefaultAlignment, spaceForOtherAlignment);
+      const shouldGoToDefaultSide = this.__shouldGoToDefaultSide(
+        currentlyOnDefaultSide, contentSize, spaceForDefaultAlignment, spaceForOtherAlignment);
 
       const shouldAlignStart = (shouldGoToDefaultSide && defaultAlignStart) || (!shouldGoToDefaultSide && !defaultAlignStart);
 

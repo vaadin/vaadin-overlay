@@ -170,7 +170,7 @@
           positionOverlay.noVerticalOverlap = true;
 
           const createToggleButton = function(prop, val1, val2) {
-            let btn = document.createElement('button');
+            const btn = document.createElement('button');
             btn.addEventListener('click', e => {
               positionOverlay[prop] = positionOverlay[prop] === val1
                 ? val2 : val1;
@@ -178,7 +178,7 @@
             });
             btn.textContent = `${prop}: ${positionOverlay[prop]}`;
             return btn;
-          }
+          };
 
           positionOverlay.renderer = function(root) {
             if (root.firstElementChild) {
