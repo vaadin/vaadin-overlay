@@ -5,11 +5,15 @@ This program is available under Apache License Version 2.0, available at https:/
 -->
 
 <script>
+  /**
+   * @namespace Vaadin
+   */
   window.Vaadin = window.Vaadin || {};
   window.Vaadin.Overlay = window.Vaadin.Overlay || {};
 
   /**
    * @polymerMixin
+   * @memberof Vaadin
    */
   Vaadin.Overlay.PositionMixin = superClass => class PositionMixin extends superClass {
 
