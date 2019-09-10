@@ -42,32 +42,32 @@
 
   <script>
 
-    const TOP = 'top', BOTTOM = 'bottom';
-    const START = 'start', END = 'end', LEFT = 'left', RIGHT = 'right';
-
-    let parent, target, overlay, overlayContent;
-    let margin;
-
-    // top or left coordinates for position target
-    let targetPositionToFlipOverlay, targetPositionForCentering;
-
-    function updatePosition() {
-      overlay._updatePosition();
-    }
-
-    function expectEdgesAligned(overlayEdge, targetEdge) {
-      expect(overlayContent.getBoundingClientRect()[overlayEdge])
-        .to.be.closeTo(target.getBoundingClientRect()[targetEdge], 1);
-    }
-
-    function setRTL() {
-      overlay.setAttribute('dir', 'rtl');
-    }
-
     describe('position target', () => {
 
+      const TOP = 'top', BOTTOM = 'bottom';
+      const START = 'start', END = 'end', LEFT = 'left', RIGHT = 'right';
+
+      let target, overlay, overlayContent;
+      let margin;
+
+      // top or left coordinates for position target
+      let targetPositionToFlipOverlay, targetPositionForCentering;
+
+      function updatePosition() {
+        overlay._updatePosition();
+      }
+
+      function expectEdgesAligned(overlayEdge, targetEdge) {
+        expect(overlayContent.getBoundingClientRect()[overlayEdge])
+          .to.be.closeTo(target.getBoundingClientRect()[targetEdge], 1);
+      }
+
+      function setRTL() {
+        overlay.setAttribute('dir', 'rtl');
+      }
+
       beforeEach(() => {
-        parent = fixture('default');
+        const parent = fixture('default');
         target = parent.querySelector('#target');
         overlay = parent.querySelector('#overlay');
         overlayContent = overlay.$.overlay;

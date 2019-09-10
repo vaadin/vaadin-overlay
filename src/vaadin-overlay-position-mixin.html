@@ -115,7 +115,11 @@ This program is available under Apache License Version 2.0, available at https:/
       const horizontalPosition = this.__calculateHorizontalPosition(targetRect, rtl);
       const verticalPosition = this.__calculateVerticalPosition(targetRect);
 
-      const props = Object.fromEntries([horizontalPosition, verticalPosition]);
+      // Object.fromEntries not supported by all browsers
+      const props = [horizontalPosition, verticalPosition].reduce((obj, [key, val]) => {
+        obj[key] = val;
+        return obj;
+      }, {});
       this.__doSetPosition(props, rtl);
     }
 
