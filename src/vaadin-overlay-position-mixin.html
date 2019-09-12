@@ -115,15 +115,11 @@ This program is available under Apache License Version 2.0, available at https:/
 
       const rtl = getComputedStyle(this).direction === 'rtl';
 
-      const horizontalPosition = this.__calculateHorizontalPosition(targetRect, rtl);
-      const verticalPosition = this.__calculateVerticalPosition(targetRect);
+      const horizontalProps = this.__calculateHorizontalPosition(targetRect, rtl);
+      const verticalProps = this.__calculateVerticalPosition(targetRect);
 
-      // Object.fromEntries not supported by all browsers
-      const props = [horizontalPosition, verticalPosition].reduce((obj, [key, val]) => {
-        obj[key] = val;
-        return obj;
-      }, {});
-      this.__doSetPosition(props, rtl);
+      const positionProps = Object.assign({}, horizontalProps, verticalProps);
+      this.__doSetPosition(positionProps, rtl);
     }
 
     __calculateHorizontalPosition(targetRect, rtl) {
@@ -152,6 +148,10 @@ This program is available under Apache License Version 2.0, available at https:/
         viewportHeight, this.__margins, defaultAlignTop, currentAlignTop, this.noVerticalOverlap, propNames);
     }
 
+    /**
+     * Returns an object with CSS position properties to set,
+     * e.g. { top: "100px", bottom: "" }
+     */
     static __calculatePositionInOneDimension(targetRect, contentSize, viewportSize, margins,
       defaultAlignStart, currentAlignStart, noOverlap, propNames) {
 
@@ -168,15 +168,18 @@ This program is available under Apache License Version 2.0, available at https:/
 
       const shouldAlignStart = (shouldGoToDefaultSide && defaultAlignStart) || (!shouldGoToDefaultSide && !defaultAlignStart);
 
-      if (shouldAlignStart) {
-        const cssPropName = propNames.start;
-        const cssPropValue = targetRect[noOverlap ? propNames.end : propNames.start];
-        return [cssPropName, cssPropValue];
-      } else {
-        const cssPropName = propNames.end;
-        const cssPropValue = viewportSize - (targetRect[noOverlap ? propNames.start : propNames.end]);
-        return [cssPropName, cssPropValue];
-      }
+      const cssPropNameToSet = shouldAlignStart ? propNames.start : propNames.end;
+      const cssPropNameToClear = shouldAlignStart ? propNames.end : propNames.start;
+
+      const cssPropValueToSet = (shouldAlignStart ?
+        targetRect[noOverlap ? propNames.end : propNames.start] :
+        viewportSize - (targetRect[noOverlap ? propNames.start : propNames.end])
+      ) + 'px';
+
+      const props = {};
+      props[cssPropNameToSet] = cssPropValueToSet;
+      props[cssPropNameToClear] = '';
+      return props;
     }
 
     static __shouldGoToDefaultSide(currentlyOnDefaultSide, contentSize, spaceOnDefaultSide, spaceOnOtherSide) {
@@ -194,13 +197,7 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     __doSetPosition(cssProps, rtl) {
-      ['left', 'right', 'top', 'bottom'].forEach(propName => {
-        if (cssProps[propName] !== undefined) {
-          this.style[propName] = cssProps[propName] + 'px';
-        } else {
-          this.style[propName] = '';
-        }
-      });
+      Object.assign(this.style, cssProps);
 
       const alignStart = (!rtl && cssProps.left) || (rtl && cssProps.right);
       this.style.alignItems = alignStart ? 'flex-start' : 'flex-end';
