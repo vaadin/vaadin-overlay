@@ -103,17 +103,16 @@ This program is available under Apache License Version 2.0, available at https:/
       if (!this.positionTarget) {
         return;
       }
+      const computedStyle = getComputedStyle(this);
       if (!this.__margins) {
-        const computedStyle = getComputedStyle(this);
         this.__margins = {};
         ['top', 'bottom', 'left', 'right'].forEach(propName => {
           this.__margins[propName] = parseInt(computedStyle[propName], 10);
         });
       }
+      const rtl = computedStyle.direction === 'rtl';
 
       const targetRect = this.positionTarget.getBoundingClientRect();
-
-      const rtl = getComputedStyle(this).direction === 'rtl';
 
       const horizontalProps = this.__calculateHorizontalPosition(targetRect, rtl);
       const verticalProps = this.__calculateVerticalPosition(targetRect);
