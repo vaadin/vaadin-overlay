@@ -126,7 +126,12 @@ This program is available under Apache License Version 2.0, available at https:/
         start: 'left',
         end: 'right'
       };
-      const contentWidth = this.$.overlay.offsetWidth;
+
+      // Using previous size to fix a case where window resize may cause the overlay to be squeezed
+      // smaller than its current space before the fit-calculations.
+      const contentWidth = Math.max((this.__oldContentWidth || 0), this.$.overlay.offsetWidth);
+      this.__oldContentWidth = this.$.overlay.offsetWidth;
+
       const viewportWidth = Math.min(window.innerWidth, document.documentElement.clientWidth);
       const defaultAlignLeft = (!rtl && this.horizontalAlign === 'start') || (rtl && this.horizontalAlign === 'end');
       const currentAlignLeft = !!this.style.left;
@@ -139,7 +144,12 @@ This program is available under Apache License Version 2.0, available at https:/
         start: 'top',
         end: 'bottom'
       };
-      const contentHeight = this.$.overlay.offsetHeight;
+
+      // Using previous size to fix a case where window resize may cause the overlay to be squeezed
+      // smaller than its current space before the fit-calculations.
+      const contentHeight = Math.max((this.__oldContentHeight || 0), this.$.overlay.offsetHeight);
+      this.__oldContentHeight = this.$.overlay.offsetHeight;
+
       const viewportHeight = Math.min(window.innerHeight, document.documentElement.clientHeight);
       const defaultAlignTop = this.verticalAlign === 'top';
       const currentAlignTop = !!this.style.top;
