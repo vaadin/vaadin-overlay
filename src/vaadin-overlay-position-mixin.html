@@ -170,39 +170,22 @@ This program is available under Apache License Version 2.0, available at https:/
       const spaceForDefaultAlignment = defaultAlignStart ? spaceForStartAlignment : spaceForEndAlignment;
       const spaceForOtherAlignment = defaultAlignStart ? spaceForEndAlignment : spaceForStartAlignment;
 
-      const currentlyOnDefaultSide = currentAlignStart === defaultAlignStart;
+      const shouldGoToDefaultSide = spaceForDefaultAlignment > spaceForOtherAlignment || spaceForDefaultAlignment > contentSize;
 
-      const shouldGoToDefaultSide = this.__shouldGoToDefaultSide(
-        currentlyOnDefaultSide, contentSize, spaceForDefaultAlignment, spaceForOtherAlignment);
-
-      const shouldAlignStart = (shouldGoToDefaultSide && defaultAlignStart) || (!shouldGoToDefaultSide && !defaultAlignStart);
+      const shouldAlignStart = defaultAlignStart === shouldGoToDefaultSide;
 
       const cssPropNameToSet = shouldAlignStart ? propNames.start : propNames.end;
       const cssPropNameToClear = shouldAlignStart ? propNames.end : propNames.start;
 
       const cssPropValueToSet = (shouldAlignStart ?
         targetRect[noOverlap ? propNames.end : propNames.start] :
-        viewportSize - (targetRect[noOverlap ? propNames.start : propNames.end])
+        viewportSize - targetRect[noOverlap ? propNames.start : propNames.end]
       ) + 'px';
 
       const props = {};
       props[cssPropNameToSet] = cssPropValueToSet;
       props[cssPropNameToClear] = '';
       return props;
-    }
-
-    static __shouldGoToDefaultSide(currentlyOnDefaultSide, contentSize, spaceOnDefaultSide, spaceOnOtherSide) {
-      if (spaceOnDefaultSide > spaceOnOtherSide) {
-        return true;
-      }
-      const fitsOnCurrentSide = contentSize < (currentlyOnDefaultSide ? spaceOnDefaultSide : spaceOnOtherSide);
-      if (currentlyOnDefaultSide) {
-        return fitsOnCurrentSide;
-      }
-      if (!fitsOnCurrentSide) {
-        return false;
-      }
-      return contentSize < spaceOnDefaultSide;
     }
 
     __doSetPosition(cssProps, rtl) {
