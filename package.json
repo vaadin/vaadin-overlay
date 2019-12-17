@@ -1,6 +1,6 @@
 {
   "name": "@vaadin/vaadin-overlay",
-  "version": "3.2.16",
+  "version": "3.2.17",
   "description": "vaadin-overlay",
   "main": "vaadin-overlay.html",
   "repository": "vaadin/vaadin-overlay",
