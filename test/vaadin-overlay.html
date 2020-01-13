@@ -306,10 +306,14 @@
           };
 
           beforeEach(() => {
-            Array.from(document.body.children).forEach(element => element.opened = false);
+            overlay.opened = false;
             modeless1 = fixture('default').firstElementChild.firstElementChild;
             modeless2 = fixture('default').firstElementChild.firstElementChild;
             modeless1.modeless = modeless2.modeless = true;
+          });
+
+          afterEach(() => {
+            modeless1.opened = modeless2.opened = false;
           });
 
           it('should bring the overlay to front with bringToFront', () => {
