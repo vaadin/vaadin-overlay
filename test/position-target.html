@@ -30,7 +30,7 @@
 
   <script>
     customElements.whenDefined('vaadin-overlay').then(() => {
-      class PositionedOverlay extends Vaadin.Overlay.PositionMixin(Vaadin.OverlayElement) {
+      class PositionedOverlay extends Vaadin.Overlay._PositionMixin(Vaadin.OverlayElement) {
         static get is() {
           return 'vaadin-positioned-overlay';
         }
