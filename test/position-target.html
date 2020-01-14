@@ -29,7 +29,17 @@
   </style>
 
   <script>
-    customElements.whenDefined('vaadin-overlay').then(() => {
+    const importsReady = () => {
+      return new Promise(resolve => {
+        if (window.HTMLImports && window.HTMLImports.whenReady) {
+          window.HTMLImports.whenReady(resolve);
+        } else {
+          customElements.whenDefined('vaadin-overlay').then(resolve);
+        }
+      });
+    };
+
+    importsReady().then(() => {
       class PositionedOverlay extends Vaadin.Overlay._PositionMixin(Vaadin.OverlayElement) {
         static get is() {
           return 'vaadin-positioned-overlay';
@@ -77,6 +87,10 @@
       function setRTL() {
         overlay.setAttribute('dir', 'rtl');
       }
+
+      before(done => {
+        customElements.whenDefined('vaadin-positioned-overlay').then(done);
+      });
 
       beforeEach(() => {
         const parent = fixture('default');
