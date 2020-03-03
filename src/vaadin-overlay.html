@@ -578,7 +578,10 @@ This program is available under Apache License Version 2.0, available at https:/
 
       _enqueueAnimation(type, callback) {
         const handler = `__${type}Handler`;
-        const listener = () => {
+        const listener = event => {
+          if (event && event.target !== this) {
+            return;
+          }
           callback();
           this.removeEventListener('animationend', listener);
           delete this[handler];
