@@ -141,13 +141,30 @@
             const hasFinishedOpening = target.hasAttribute('opened') && !target.hasAttribute('opening');
             if (hasFinishedOpening) {
               observer.disconnect();
-              callback();
+              Polymer.RenderStatus.afterNextRender(overlay, callback);
               return;
             }
           }
         }
       });
       observer.observe(overlay, {attributes: true, attributeFilter: ['opening']});
+    }
+
+    function afterOverlayClosingFinished(overlay, callback) {
+      const observer = new MutationObserver((mutations, observer) => {
+        for (const mutation of mutations) {
+          if (mutation.attributeName === 'closing') {
+            const target = mutation.target;
+            const hasFinishedClosing = !target.hasAttribute('opened') && !target.hasAttribute('closing');
+            if (hasFinishedClosing) {
+              observer.disconnect();
+              Polymer.RenderStatus.afterNextRender(overlay, callback);
+              return;
+            }
+          }
+        }
+      });
+      observer.observe(overlay, {attributes: true, attributeFilter: ['closing']});
     }
 
     [false, true].forEach(withAnimation => {
@@ -194,7 +211,7 @@
           expect(overlay.parentNode).not.to.equal(document.body);
         });
 
-        it('should not animate closing if the overlay is explicilty hidden', () => {
+        it('should not animate closing if the overlay is explicitly hidden', () => {
           overlay.opened = true;
           overlay.hidden = true;
           overlay.opened = false;
@@ -229,7 +246,7 @@
         });
 
         it('should remove pointer events on previously opened overlay', done => {
-          afterOverlayOpeningFinished(overlays[1], () => {
+          afterOverlayClosingFinished(overlays[0], () => {
             expect(overlays[0].$.overlay.style.pointerEvents).to.equal('');
             done();
           });
