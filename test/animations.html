@@ -135,7 +135,8 @@
   <script>
     function afterOverlayOpeningFinished(overlay, callback) {
       const observer = new MutationObserver((mutations, observer) => {
-        for (const mutation of mutations) {
+        for (let i = 0; i < mutations.length; i++) {
+          const mutation = mutations[i];
           if (mutation.attributeName === 'opening') {
             const target = mutation.target;
             const hasFinishedOpening = target.hasAttribute('opened') && !target.hasAttribute('opening');
@@ -152,7 +153,8 @@
 
     function afterOverlayClosingFinished(overlay, callback) {
       const observer = new MutationObserver((mutations, observer) => {
-        for (const mutation of mutations) {
+        for (let i = 0; i < mutations.length; i++) {
+          const mutation = mutations[i];
           if (mutation.attributeName === 'closing') {
             const target = mutation.target;
             const hasFinishedClosing = !target.hasAttribute('opened') && !target.hasAttribute('closing');
