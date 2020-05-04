@@ -291,7 +291,7 @@ This program is available under Apache License Version 2.0, available at https:/
 
           /**
            * References the content container after the template is stamped.
-           * @type {HTMLElement}
+           * @type {!HTMLElement | undefined}
            */
           content: {
             type: Object,
@@ -300,6 +300,7 @@ This program is available under Apache License Version 2.0, available at https:/
 
           /**
            * When true the overlay has backdrop on top of content when opened.
+           * @type {boolean}
            */
           withBackdrop: {
             type: Boolean,
@@ -315,6 +316,7 @@ This program is available under Apache License Version 2.0, available at https:/
           /**
            * When true the overlay won't disable the main content, showing
            * it doesn’t change the functionality of the user interface.
+           * @type {boolean}
            */
           modeless: {
             type: Boolean,
@@ -326,7 +328,7 @@ This program is available under Apache License Version 2.0, available at https:/
           /**
            * When set to true, the overlay is hidden. This also closes the overlay
            * immediately in case there is a closing animation in progress.
-           * @type {boolean!}
+           * @type {boolean}
            */
           hidden: {
             type: Boolean,
@@ -337,6 +339,7 @@ This program is available under Apache License Version 2.0, available at https:/
           /**
            * When true move focus to the first focusable element in the overlay,
            * or to the overlay if there are no focusable elements.
+           * @type {boolean}
            */
           focusTrap: {
             type: Boolean,
@@ -345,6 +348,7 @@ This program is available under Apache License Version 2.0, available at https:/
 
           /**
            * Set to true to enable restoring of focus when overlay is closed.
+           * @type {boolean}
            */
           restoreFocusOnClose: {
             type: Boolean,
@@ -450,7 +454,10 @@ This program is available under Apache License Version 2.0, available at https:/
         }
       }
 
-      /** @private */
+      /**
+       * @param {!Array<!Element>} nodes
+       * @protected
+       */
       _setTemplateFromNodes(nodes) {
         this.template = nodes.filter(node => node.localName && node.localName === 'template')[0] || this.template;
       }
@@ -556,7 +563,7 @@ This program is available under Apache License Version 2.0, available at https:/
         }
       }
 
-      /** @private */
+      /** @protected */
       _ensureTemplatized() {
         this._setTemplateFromNodes(Array.from(this.children));
       }
@@ -605,14 +612,21 @@ This program is available under Apache License Version 2.0, available at https:/
         }
       }
 
-      /** @private */
+      /**
+       * @return {boolean}
+       * @protected
+       */
       _shouldAnimate() {
         const name = getComputedStyle(this).getPropertyValue('animation-name');
         const hidden = getComputedStyle(this).getPropertyValue('display') === 'none';
         return !hidden && name && name != 'none';
       }
 
-      /** @private */
+      /**
+       * @param {string} type
+       * @param {Function} callback
+       * @protected
+       */
       _enqueueAnimation(type, callback) {
         const handler = `__${type}Handler`;
         const listener = event => {
@@ -627,7 +641,10 @@ This program is available under Apache License Version 2.0, available at https:/
         this.addEventListener('animationend', listener);
       }
 
-      /** @private */
+      /**
+       * @param {string} type
+       * @protected
+       */
       _flushAnimation(type) {
         const handler = `__${type}Handler`;
         if (typeof this[handler] === 'function') {
@@ -635,7 +652,7 @@ This program is available under Apache License Version 2.0, available at https:/
         }
       }
 
-      /** @private */
+      /** @protected */
       _animatedOpening() {
         if (this.parentNode === document.body && this.hasAttribute('closing')) {
           this._flushAnimation('closing');
@@ -659,7 +676,7 @@ This program is available under Apache License Version 2.0, available at https:/
         }
       }
 
-      /** @private */
+      /** @protected */
       _attachOverlay() {
         this._placeholder = document.createComment('vaadin-overlay-placeholder');
         this.parentNode.insertBefore(this._placeholder, this);
@@ -667,7 +684,7 @@ This program is available under Apache License Version 2.0, available at https:/
         this.bringToFront();
       }
 
-      /** @private */
+      /** @protected */
       _animatedClosing() {
         if (this.hasAttribute('opening')) {
           this._flushAnimation('opening');
@@ -706,7 +723,7 @@ This program is available under Apache License Version 2.0, available at https:/
         }
       }
 
-      /** @private */
+      /** @protected */
       _detachOverlay() {
         this._placeholder.parentNode.insertBefore(this, this._placeholder);
         this._placeholder.parentNode.removeChild(this._placeholder);
@@ -724,7 +741,8 @@ This program is available under Apache License Version 2.0, available at https:/
 
       /**
        * returns true if this is the last one in the opened overlays stack
-       * @private
+       * @return {boolean}
+       * @protected
        */
       get _last() {
         return this === OverlayElement.__attachedInstances.pop();
@@ -743,7 +761,7 @@ This program is available under Apache License Version 2.0, available at https:/
         }
       }
 
-      /** @private */
+      /** @protected */
       _addGlobalListeners() {
         document.addEventListener('mousedown', this._boundMouseDownListener);
         document.addEventListener('mouseup', this._boundMouseUpListener);
@@ -753,7 +771,7 @@ This program is available under Apache License Version 2.0, available at https:/
         document.addEventListener('keydown', this._boundKeydownListener);
       }
 
-      /** @private */
+      /** @protected */
       _enterModalState() {
         if (document.body.style.pointerEvents !== 'none') {
           // Set body pointer-events to 'none' to disable mouse interactions with
@@ -770,7 +788,7 @@ This program is available under Apache License Version 2.0, available at https:/
         });
       }
 
-      /** @private */
+      /** @protected */
       _removeGlobalListeners() {
         document.removeEventListener('mousedown', this._boundMouseDownListener);
         document.removeEventListener('mouseup', this._boundMouseUpListener);
@@ -778,7 +796,7 @@ This program is available under Apache License Version 2.0, available at https:/
         document.removeEventListener('keydown', this._boundKeydownListener);
       }
 
-      /** @private */
+      /** @protected */
       _exitModalState() {
         if (this._previousDocumentPointerEvents !== undefined) {
           // Restore body pointer-events
@@ -803,7 +821,7 @@ This program is available under Apache License Version 2.0, available at https:/
         }
       }
 
-      /** @private */
+      /** @protected */
       _removeOldContent() {
         if (!this.content || !this._contentNodes) {
           return;
@@ -830,7 +848,11 @@ This program is available under Apache License Version 2.0, available at https:/
         this.content = undefined;
       }
 
-      /** @private */
+      /**
+       * @param {!HTMLTemplateElement} template
+       * @param {object} instanceProps
+       * @protected
+       */
       _stampOverlayTemplate(template, instanceProps) {
         this._removeOldContent();
 
@@ -960,18 +982,30 @@ This program is available under Apache License Version 2.0, available at https:/
         }
       }
 
-      /** @private */
+      /**
+       * @param {Element} element
+       * @return {boolean}
+       * @protected
+       */
       _isFocused(element) {
         return element && element.getRootNode().activeElement === element;
       }
 
-      /** @private */
+      /**
+       * @param {Element[]} elements
+       * @return {number}
+       * @protected
+       */
       _focusedIndex(elements) {
         elements = elements || this._getFocusableElements();
         return elements.indexOf(elements.filter(this._isFocused).pop());
       }
 
-      /** @private */
+      /**
+       * @param {number} increment
+       * @param {number} index
+       * @protected
+       */
       _cycleTab(increment, index) {
         const focusableElements = this._getFocusableElements();
 
@@ -992,13 +1026,19 @@ This program is available under Apache License Version 2.0, available at https:/
         focusableElements[index].focus();
       }
 
-      /** @private */
+      /**
+       * @return {!Array<!HTMLElement>}
+       * @protected
+       */
       _getFocusableElements() {
         // collect all focusable elements
         return Vaadin.FocusablesHelper.getTabbableNodes(this.$.overlay);
       }
 
-      /** @private */
+      /**
+       * @return {!Element}
+       * @protected
+       */
       _getActiveElement() {
         let active = document._activeElement || document.activeElement;
         // document.activeElement can be null
@@ -1015,7 +1055,11 @@ This program is available under Apache License Version 2.0, available at https:/
         return active;
       }
 
-      /** @private */
+      /**
+       * @param {!Element} node
+       * @return {boolean}
+       * @protected
+       */
       _deepContains(node) {
         if (this.contains(node)) {
           return true;
