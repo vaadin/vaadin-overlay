@@ -672,7 +672,8 @@ This program is available under Apache License Version 2.0, available at https:/
        * Returns all attached overlays.
        */
       static get __attachedInstances() {
-        return Array.from(document.body.children).filter(el => el instanceof OverlayElement);
+        return Array.from(document.body.children)
+          .filter(el => el instanceof OverlayElement && !el.hasAttribute('closing'));
       }
 
       /**
