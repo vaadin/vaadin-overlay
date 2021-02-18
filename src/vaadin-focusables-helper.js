@@ -3,9 +3,6 @@
  * Copyright (c) 2021 Vaadin Ltd.
  * This program is available under Apache License Version 2.0, available at https://vaadin.com/license/
  */
-const p = Element.prototype;
-const matches = p.matches || p.matchesSelector || p.mozMatchesSelector ||
-  p.msMatchesSelector || p.oMatchesSelector || p.webkitMatchesSelector;
 
 /**
  * `Polymer.IronFocusablesHelper` relies on some Polymer-specific legacy API,
@@ -50,11 +47,11 @@ class FocusablesHelper {
     // http://allyjs.io/data-tables/focusable.html
 
     // Elements that cannot be focused if they have [disabled] attribute.
-    if (matches.call(element, 'input, select, textarea, button, object')) {
-      return matches.call(element, ':not([disabled])');
+    if (element.matches('input, select, textarea, button, object')) {
+      return element.matches(':not([disabled])');
     }
     // Elements that can be focused even if they have [disabled] attribute.
-    return matches.call(element, 'a[href], area[href], iframe, [tabindex], [contentEditable]');
+    return element.matches('a[href], area[href], iframe, [tabindex], [contentEditable]');
   }
 
   /**
@@ -65,7 +62,7 @@ class FocusablesHelper {
    */
   static isTabbable(element) {
     return this.isFocusable(element) &&
-        matches.call(element, ':not([tabindex="-1"])') &&
+        element.matches(':not([tabindex="-1"])') &&
         this._isVisible(element);
   }
 
