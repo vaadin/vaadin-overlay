@@ -5,21 +5,6 @@ module.exports = {
   verbose: true,
   testTimeout: 180 * 1000,
   plugins: {
-    // MAGI REMOVE START
-    istanbul: {
-      dir: './coverage',
-      reporters: ['text-summary', 'lcov'],
-      include: [
-        '**/vaadin-overlay/src/*.html'
-      ],
-      exclude: [],
-      thresholds: {
-        global: {
-          statements: 85
-        }
-      }
-    },
-    // MAGI REMOVE END
     local: {
       browserOptions: {
         chrome: [

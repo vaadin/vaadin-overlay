@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>vaadin-overlay styling tests</title>
-  <script src="../../web-component-tester/browser.js"></script>
-  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-  <link rel="import" href="../../test-fixture/test-fixture.html">
-  <link rel="import" href="../vaadin-overlay.html">
-  <link rel="import" href="../../polymer/polymer-element.html">
+  <script src="../../../wct-browser-legacy/browser.js"></script>
+  <script src="../../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+  <script type="module" src="../../../@polymer/test-fixture/test-fixture.js"></script>
+  <script type="module" src="../vaadin-overlay.js"></script>
+  <script type="module" src="../../../@polymer/polymer/polymer-element.js"></script>
 </head>
 
 <body>
@@ -47,21 +47,23 @@
       </vaadin-overlay>
     </template>
   </dom-module>
-  <script>
-    addEventListener('WebComponentsReady', () => {
-      customElements.define('local-styles', class extends Vaadin.ThemableMixin(Polymer.Element) {
-        static get is() {
-          return 'local-styles';
-        }
+  <script type="module">
+import '@polymer/test-fixture/test-fixture.js';
+import '../vaadin-overlay.js';
+import { PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
+customElements.define('local-styles', class extends ThemableMixin(PolymerElement) {
+  static get is() {
+    return 'local-styles';
+  }
 
-        static get properties() {
-          return {
-            opened: Boolean
-          };
-        }
-      });
-    });
-  </script>
+  static get properties() {
+    return {
+      opened: Boolean
+    };
+  }
+});
+</script>
 
   <test-fixture id="localStyles">
     <template>
@@ -93,21 +95,22 @@
       </vaadin-overlay>
     </template>
   </dom-module>
-  <script>
-    addEventListener('WebComponentsReady', () => {
-      customElements.define('local-styles-property', class extends Polymer.Element {
-        static get is() {
-          return 'local-styles-property';
-        }
+  <script type="module">
+import '@polymer/test-fixture/test-fixture.js';
+import '../vaadin-overlay.js';
+import { PolymerElement } from '@polymer/polymer/polymer-element.js';
+customElements.define('local-styles-property', class extends PolymerElement {
+  static get is() {
+    return 'local-styles-property';
+  }
 
-        static get properties() {
-          return {
-            opened: Boolean
-          };
-        }
-      });
-    });
-  </script>
+  static get properties() {
+    return {
+      opened: Boolean
+    };
+  }
+});
+</script>
 
   <test-fixture id="localStylesProperty">
     <template>
@@ -141,187 +144,191 @@
       </vaadin-overlay>
     </template>
   </dom-module>
-  <script>
-    addEventListener('WebComponentsReady', () => {
-      customElements.define('is-custom-element', class extends Polymer.Element {
-        static get is() {
-          return 'is-custom-element';
-        }
-      });
-    });
-  </script>
+  <script type="module">
+import '@polymer/test-fixture/test-fixture.js';
+import '../vaadin-overlay.js';
+import { PolymerElement } from '@polymer/polymer/polymer-element.js';
+customElements.define('is-custom-element', class extends PolymerElement {
+  static get is() {
+    return 'is-custom-element';
+  }
+});
+</script>
   <test-fixture id="isCustomElement">
     <template>
       <is-custom-element is="is-value"></is-custom-element>
     </template>
   </test-fixture>
 
-  <script>
-    function getComputedStyleSource(element) {
-      return window.getComputedStyle(element).getPropertyValue('font-family')
-        .trim().replace(/^([''"])(.*)\1/, '$2');
-    }
+  <script type="module">
+import '@polymer/test-fixture/test-fixture.js';
+import '../vaadin-overlay.js';
+import '@polymer/polymer/polymer-element.js';
+function getComputedStyleSource(element) {
+  return window.getComputedStyle(element).getPropertyValue('font-family')
+    .trim().replace(/^([''"])(.*)\1/, '$2');
+}
 
-    describe('overlay content styling', () => {
-      let overlay;
+describe('overlay content styling', () => {
+  let overlay;
 
-      describe('local styles', () => {
-        beforeEach(done => {
-          const localStyles = fixture('localStyles');
-          overlay = localStyles.$.overlay;
-          overlay.opened = true;
-          // NOTE(platosha): It’s important that nothing breaks after a flush.
-          // Not having a flush here might produce false positive results.
-          flush(done);
-        });
+  describe('local styles', () => {
+    beforeEach(done => {
+      const localStyles = fixture('localStyles');
+      overlay = localStyles.$.overlay;
+      overlay.opened = true;
+      // NOTE(platosha): It’s important that nothing breaks after a flush.
+      // Not having a flush here might produce false positive results.
+      flush(done);
+    });
 
-        afterEach(() => {
-          overlay.opened = false;
-        });
+    afterEach(() => {
+      overlay.opened = false;
+    });
 
-        it('should stamp content into a shadowRoot', () => {
-          expect(overlay.content).to.be.instanceof(ShadowRoot);
-        });
+    it('should stamp content into a shadowRoot', () => {
+      expect(overlay.content).to.be.instanceof(ShadowRoot);
+    });
 
-        it('should not slot the content', () => {
-          expect(overlay.content.children[0].assignedSlot).to.be.null;
-          expect(overlay.content.children[1].assignedSlot).to.be.null;
-        });
+    it('should not slot the content', () => {
+      expect(overlay.content.children[0].assignedSlot).to.be.null;
+      expect(overlay.content.children[1].assignedSlot).to.be.null;
+    });
 
-        it('should apply local styles to overlay content', () => {
-          expect(getComputedStyleSource(
-            overlay.content.querySelector('.local-styles-content')
-          )).to.equal('.local-styles-content');
-        });
+    it('should apply local styles to overlay content', () => {
+      expect(getComputedStyleSource(
+        overlay.content.querySelector('.local-styles-content')
+      )).to.equal('.local-styles-content');
+    });
 
-        it('should apply styles from themable mixin to overlay content', () => {
-          expect(getComputedStyleSource(
-            overlay.content.querySelector('.themed-styles-content')
-          )).to.equal('.themed-styles-content');
-        });
+    it('should apply styles from themable mixin to overlay content', () => {
+      expect(getComputedStyleSource(
+        overlay.content.querySelector('.themed-styles-content')
+      )).to.equal('.themed-styles-content');
+    });
 
-        it('should not apply global styles to overlay content', () => {
-          expect(getComputedStyleSource(
-            overlay.content.querySelector('.global-styles-content')
-          )).to.not.equal('.global-styles-content');
-        });
+    it('should not apply global styles to overlay content', () => {
+      expect(getComputedStyleSource(
+        overlay.content.querySelector('.global-styles-content')
+      )).to.not.equal('.global-styles-content');
+    });
 
-        it('should not apply host styles to overlay content', () => {
-          expect(getComputedStyleSource(overlay.content.host)).to.not.equal(':host');
-        });
+    it('should not apply host styles to overlay content', () => {
+      expect(getComputedStyleSource(overlay.content.host)).to.not.equal(':host');
+    });
 
-        it('should not apply local part styles to overlay', () => {
-          expect(getComputedStyleSource(
-            overlay.shadowRoot.querySelector('[part="overlay"]')
-          )).to.not.equal('[part="overlay"]');
-        });
+    it('should not apply local part styles to overlay', () => {
+      expect(getComputedStyleSource(
+        overlay.shadowRoot.querySelector('[part="overlay"]')
+      )).to.not.equal('[part="overlay"]');
+    });
 
-        it('should cache created overlay content tag name', done => {
-          const localStyles2 = document.createElement('local-styles');
-          document.body.appendChild(localStyles2);
-          const overlay2 = localStyles2.$.overlay;
-          overlay2.opened = true;
-          flush(() => {
-            expect(overlay2.$.content.tagName).to.equal(overlay.$.content.tagName);
-            overlay2.opened = false;
-            document.body.removeChild(localStyles2);
-            done();
-          });
-        });
-      });
-
-      if (window.ShadyCSS && !window.ShadyCSS.nativeShadow && !window.ShadyCSS.nativeCss) {
-        // NOTE(platosha): 'local styles' and 'local styles property' are two
-        // very similar cases, the only difference is that the latter uses
-        // a custom CSS property in the styles. If ShadyCSS’ CSS properties
-        // shim is in use (read: in MSIE 11), additional scoping is applied
-        // in this case.
-
-        describe('local styles property', () => {
-          beforeEach(done => {
-            const localStylesProperty = fixture('localStylesProperty');
-            overlay = localStylesProperty.$.overlay;
-            overlay.opened = true;
-            // NOTE(platosha): It’s important that nothing breaks after a flush.
-            // Not having a flush here might produce false positive results.
-            flush(done);
-          });
-
-          afterEach(() => {
-            overlay.opened = false;
-          });
-
-          it('should stamp content into a shadowRoot', () => {
-            expect(overlay.content).to.be.instanceof(ShadowRoot);
-          });
-
-          it('should not slot the content', () => {
-            expect(overlay.content.children[0].assignedSlot).to.be.null;
-            expect(overlay.content.children[1].assignedSlot).to.be.null;
-          });
-
-          it('should apply local styles to overlay content', () => {
-            expect(getComputedStyleSource(
-              overlay.content.querySelector('.local-styles-content')
-            )).to.equal('.local-styles-content');
-          });
-
-          it('should not apply global styles to overlay content', () => {
-            expect(getComputedStyleSource(
-              overlay.content.querySelector('.global-styles-content')
-            )).to.not.equal('.global-styles-content');
-          });
-
-          it('should not apply host styles to overlay content', () => {
-            expect(getComputedStyleSource(overlay.content.host)).to.not.equal(':host');
-          });
-
-          it('should not apply local part styles to overlay', () => {
-            expect(getComputedStyleSource(
-              overlay.shadowRoot.querySelector('[part="overlay"]')
-            )).to.not.equal('[part="overlay"]');
-          });
-
-          it('should have overlay style scope on the content part', () => {
-            expect(
-              overlay.shadowRoot.querySelector('[part="content"]').className
-            ).to.contain('style-scope vaadin-overlay');
-          });
-        });
-      }
-
-      describe('global styles', () => {
-        beforeEach(() => {
-          overlay = fixture('globalStyles');
-          overlay.opened = true;
-        });
-
-        afterEach(() => {
-          overlay.opened = false;
-        });
-
-        it('should stamp content into overlay host', () => {
-          expect(overlay.content).to.equal(overlay);
-        });
-
-        it('should slot content into content part', () => {
-          const slot = overlay.$.content.firstElementChild;
-          expect(overlay.content.children[0].assignedSlot).to.equal(slot);
-          expect(overlay.content.children[1].assignedSlot).to.equal(slot);
-        });
-
-        it('should apply global styles to overlay content', () => {
-          expect(getComputedStyleSource(
-            overlay.content.querySelector('.global-styles-content')
-          )).to.equal('.global-styles-content');
-        });
-
-        it('should not apply local styles to overlay content', () => {
-          expect(getComputedStyleSource(
-            overlay.content.querySelector('.local-styles-content')
-          )).to.not.equal('.local-styles-content');
-        });
+    it('should cache created overlay content tag name', done => {
+      const localStyles2 = document.createElement('local-styles');
+      document.body.appendChild(localStyles2);
+      const overlay2 = localStyles2.$.overlay;
+      overlay2.opened = true;
+      flush(() => {
+        expect(overlay2.$.content.tagName).to.equal(overlay.$.content.tagName);
+        overlay2.opened = false;
+        document.body.removeChild(localStyles2);
+        done();
       });
     });
-  </script>
+  });
+
+  if (window.ShadyCSS && !window.ShadyCSS.nativeShadow && !window.ShadyCSS.nativeCss) {
+    // NOTE(platosha): 'local styles' and 'local styles property' are two
+    // very similar cases, the only difference is that the latter uses
+    // a custom CSS property in the styles. If ShadyCSS’ CSS properties
+    // shim is in use (read: in MSIE 11), additional scoping is applied
+    // in this case.
+
+    describe('local styles property', () => {
+      beforeEach(done => {
+        const localStylesProperty = fixture('localStylesProperty');
+        overlay = localStylesProperty.$.overlay;
+        overlay.opened = true;
+        // NOTE(platosha): It’s important that nothing breaks after a flush.
+        // Not having a flush here might produce false positive results.
+        flush(done);
+      });
+
+      afterEach(() => {
+        overlay.opened = false;
+      });
+
+      it('should stamp content into a shadowRoot', () => {
+        expect(overlay.content).to.be.instanceof(ShadowRoot);
+      });
+
+      it('should not slot the content', () => {
+        expect(overlay.content.children[0].assignedSlot).to.be.null;
+        expect(overlay.content.children[1].assignedSlot).to.be.null;
+      });
+
+      it('should apply local styles to overlay content', () => {
+        expect(getComputedStyleSource(
+          overlay.content.querySelector('.local-styles-content')
+        )).to.equal('.local-styles-content');
+      });
+
+      it('should not apply global styles to overlay content', () => {
+        expect(getComputedStyleSource(
+          overlay.content.querySelector('.global-styles-content')
+        )).to.not.equal('.global-styles-content');
+      });
+
+      it('should not apply host styles to overlay content', () => {
+        expect(getComputedStyleSource(overlay.content.host)).to.not.equal(':host');
+      });
+
+      it('should not apply local part styles to overlay', () => {
+        expect(getComputedStyleSource(
+          overlay.shadowRoot.querySelector('[part="overlay"]')
+        )).to.not.equal('[part="overlay"]');
+      });
+
+      it('should have overlay style scope on the content part', () => {
+        expect(
+          overlay.shadowRoot.querySelector('[part="content"]').className
+        ).to.contain('style-scope vaadin-overlay');
+      });
+    });
+  }
+
+  describe('global styles', () => {
+    beforeEach(() => {
+      overlay = fixture('globalStyles');
+      overlay.opened = true;
+    });
+
+    afterEach(() => {
+      overlay.opened = false;
+    });
+
+    it('should stamp content into overlay host', () => {
+      expect(overlay.content).to.equal(overlay);
+    });
+
+    it('should slot content into content part', () => {
+      const slot = overlay.$.content.firstElementChild;
+      expect(overlay.content.children[0].assignedSlot).to.equal(slot);
+      expect(overlay.content.children[1].assignedSlot).to.equal(slot);
+    });
+
+    it('should apply global styles to overlay content', () => {
+      expect(getComputedStyleSource(
+        overlay.content.querySelector('.global-styles-content')
+      )).to.equal('.global-styles-content');
+    });
+
+    it('should not apply local styles to overlay content', () => {
+      expect(getComputedStyleSource(
+        overlay.content.querySelector('.local-styles-content')
+      )).to.not.equal('.local-styles-content');
+    });
+  });
+});
+</script>
 </body>

@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <title>vaadin-overlay restore-focus tests</title>
-  <script src="../../web-component-tester/browser.js"></script>
-  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-  <link rel="import" href="../../test-fixture/test-fixture.html">
-  <link rel="import" href="../vaadin-overlay.html">
-  <link rel="import" href="../../polymer/polymer-element.html">
-  <link rel="import" href="../../iron-test-helpers/mock-interactions.html">
-  <link rel="import" href="../../vaadin-text-field/vaadin-text-field.html">
+  <script src="../../../wct-browser-legacy/browser.js"></script>
+  <script src="../../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+  <script type="module" src="../../../@polymer/test-fixture/test-fixture.js"></script>
+  <script type="module" src="../vaadin-overlay.js"></script>
+  <script type="module" src="../../../@polymer/polymer/polymer-element.js"></script>
+  <script type="module" src="../../../@polymer/iron-test-helpers/mock-interactions.js"></script>
+  <script type="module" src="../../../@vaadin/vaadin-text-field/vaadin-text-field.js"></script>
 </head>
 
 <body>
@@ -23,15 +23,18 @@
       <input id="focusable">
     </template>
   </dom-module>
-  <script>
-    document.addEventListener('WebComponentsReady', () => {
-      window.customElements.define('x-wrapper', class extends Polymer.Element {
-        static get is() {
-          return 'x-wrapper';
-        }
-      });
-    });
-  </script>
+  <script type="module">
+import '@polymer/test-fixture/test-fixture.js';
+import '../vaadin-overlay.js';
+import { PolymerElement } from '@polymer/polymer/polymer-element.js';
+import '@polymer/iron-test-helpers/mock-interactions.js';
+import '@vaadin/vaadin-text-field/vaadin-text-field.js';
+window.customElements.define('x-wrapper', class extends PolymerElement {
+  static get is() {
+    return 'x-wrapper';
+  }
+});
+</script>
 
   <test-fixture id="wrapper">
     <template>
@@ -41,78 +44,84 @@
 
   <input id="focusInput">
 
-  <script>
-    describe('restore focus on close', function() {
-      let overlay, parent, focusInput, focusable;
+  <script type="module">
+import '@polymer/test-fixture/test-fixture.js';
+import '../vaadin-overlay.js';
+import '@polymer/polymer/polymer-element.js';
+import '@polymer/iron-test-helpers/mock-interactions.js';
+import '@vaadin/vaadin-text-field/vaadin-text-field.js';
+import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
+describe('restore focus on close', function() {
+  let overlay, parent, focusInput, focusable;
 
-      function runAfterOpen(overlay, callback) {
-        overlay.addEventListener('vaadin-overlay-open', callback);
-        overlay.opened = true;
-      }
+  function runAfterOpen(overlay, callback) {
+    overlay.addEventListener('vaadin-overlay-open', callback);
+    overlay.opened = true;
+  }
 
-      function runAfterClose(overlay, callback) {
-        Polymer.RenderStatus.afterNextRender(overlay, callback);
-        overlay.opened = false;
-      }
+  function runAfterClose(overlay, callback) {
+    afterNextRender(overlay, callback);
+    overlay.opened = false;
+  }
 
-      beforeEach(() => {
-        parent = fixture('wrapper');
-        overlay = parent.$.overlay;
-        focusable = parent.$.focusable;
-        focusInput = document.getElementById('focusInput');
-        overlay._observer.flush();
-        window.focus();
+  beforeEach(() => {
+    parent = fixture('wrapper');
+    overlay = parent.$.overlay;
+    focusable = parent.$.focusable;
+    focusInput = document.getElementById('focusInput');
+    overlay._observer.flush();
+    window.focus();
+  });
+
+  afterEach(() => {
+    document.body.focus();
+  });
+
+  it('should not restore focus on close by default (restore-focus-on-close=false)', done => {
+    overlay.restoreFocusOnClose = false;
+    focusInput.focus();
+    runAfterOpen(overlay, () => {
+      runAfterClose(overlay, () => {
+        expect(overlay._getActiveElement()).to.not.equal(focusInput);
+        done();
       });
-
-      afterEach(() => {
-        document.body.focus();
-      });
-
-      it('should not restore focus on close by default (restore-focus-on-close=false)', done => {
-        overlay.restoreFocusOnClose = false;
-        focusInput.focus();
-        runAfterOpen(overlay, () => {
-          runAfterClose(overlay, () => {
-            expect(overlay._getActiveElement()).to.not.equal(focusInput);
-            done();
-          });
-        });
-      });
-
-      it('should restore focus on close (restore-focus-on-close=true)', done => {
-        overlay.restoreFocusOnClose = true;
-        focusInput.focus();
-        runAfterOpen(overlay, () => {
-          runAfterClose(overlay, () => {
-            expect(overlay._getActiveElement()).to.equal(focusInput);
-            done();
-          });
-        });
-      });
-
-      it('should restore focus on close in Shadow DOM (restore-focus-on-close=true)', done => {
-        overlay.restoreFocusOnClose = true;
-        focusable.focus();
-        runAfterOpen(overlay, () => {
-          runAfterClose(overlay, () => {
-            expect(overlay._getActiveElement()).to.equal(focusable);
-            done();
-          });
-        });
-      });
-
-      it('should not restore focus on close if focus was changed', done => {
-        overlay.restoreFocusOnClose = true;
-        focusInput.focus();
-        runAfterOpen(overlay, () => {
-          focusable.focus();
-          runAfterClose(overlay, () => {
-            expect(overlay._getActiveElement()).to.equal(focusable);
-            done();
-          });
-        });
-      });
-
     });
-  </script>
+  });
+
+  it('should restore focus on close (restore-focus-on-close=true)', done => {
+    overlay.restoreFocusOnClose = true;
+    focusInput.focus();
+    runAfterOpen(overlay, () => {
+      runAfterClose(overlay, () => {
+        expect(overlay._getActiveElement()).to.equal(focusInput);
+        done();
+      });
+    });
+  });
+
+  it('should restore focus on close in Shadow DOM (restore-focus-on-close=true)', done => {
+    overlay.restoreFocusOnClose = true;
+    focusable.focus();
+    runAfterOpen(overlay, () => {
+      runAfterClose(overlay, () => {
+        expect(overlay._getActiveElement()).to.equal(focusable);
+        done();
+      });
+    });
+  });
+
+  it('should not restore focus on close if focus was changed', done => {
+    overlay.restoreFocusOnClose = true;
+    focusInput.focus();
+    runAfterOpen(overlay, () => {
+      focusable.focus();
+      runAfterClose(overlay, () => {
+        expect(overlay._getActiveElement()).to.equal(focusable);
+        done();
+      });
+    });
+  });
+
+});
+</script>
 </body>
