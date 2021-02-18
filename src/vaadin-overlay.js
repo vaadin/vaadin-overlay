@@ -152,8 +152,9 @@ const processOverlayStyles = (cssText) => {
  *
  * See [ThemableMixin – how to apply styles for shadow parts](https://github.com/vaadin/vaadin-themable-mixin/wiki)
  *
- * @extends PolymerElement
+ * @extends HTMLElement
  * @mixes ThemableMixin
+ * @mixes DirMixin
  */
 class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
   static get template() {

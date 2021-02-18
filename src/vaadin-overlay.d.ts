@@ -1,18 +1,6 @@
-import {PolymerElement} from '@polymer/polymer/polymer-element.js';
-
-import {templatize} from '@polymer/polymer/lib/utils/templatize.js';
-
-import {afterNextRender} from '@polymer/polymer/lib/utils/render-status.js';
-
-import {FlattenedNodesObserver} from '@polymer/polymer/lib/utils/flattened-nodes-observer.js';
-
 import {ThemableMixin} from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
 
 import {DirMixin} from '@vaadin/vaadin-element-mixin/vaadin-dir-mixin.js';
-
-import {FocusablesHelper} from './vaadin-focusables-helper.js';
-
-import {html} from '@polymer/polymer/lib/utils/html-tag.js';
 
 /**
  * `<vaadin-overlay>` is a Web Component for creating overlays. The content of the overlay
@@ -103,9 +91,7 @@ import {html} from '@polymer/polymer/lib/utils/html-tag.js';
  *
  * See [ThemableMixin – how to apply styles for shadow parts](https://github.com/vaadin/vaadin-themable-mixin/wiki)
  */
-declare class OverlayElement extends
-  ThemableMixin(
-  PolymerElement) {
+declare class OverlayElement extends ThemableMixin(DirMixin(HTMLElement)) {
 
   /**
    * returns true if this is the last one in the opened overlays stack
@@ -179,35 +165,54 @@ declare class OverlayElement extends
    * Set to true to enable restoring of focus when overlay is closed.
    */
   restoreFocusOnClose: boolean;
-  ready(): void;
-  connectedCallback(): void;
-  disconnectedCallback(): void;
+
   _setTemplateFromNodes(nodes: Element[]): void;
+
   close(sourceEvent?: Event|null): void;
+
   _ensureTemplatized(): void;
+
   _shouldAnimate(): boolean;
+
   _enqueueAnimation(type: string, callback: Function|null): void;
+
   _flushAnimation(type: string): void;
+
   _animatedOpening(): void;
+
   _attachOverlay(): void;
+
   _animatedClosing(): void;
+
   _detachOverlay(): void;
+
   _addGlobalListeners(): void;
+
   _enterModalState(): void;
+
   _removeGlobalListeners(): void;
+
   _exitModalState(): void;
+
   _removeOldContent(): void;
+
   _stampOverlayTemplate(template: HTMLTemplateElement, instanceProps: object|null): void;
 
   /**
    * Manually invoke existing renderer.
    */
   render(): void;
+
   _isFocused(element: Element|null): boolean;
+
   _focusedIndex(elements: Array<Element|null>|null): number;
+
   _cycleTab(increment: number, index: number|undefined): void;
+
   _getFocusableElements(): HTMLElement[];
+
   _getActiveElement(): Element;
+
   _deepContains(node: Node): boolean;
 
   /**
