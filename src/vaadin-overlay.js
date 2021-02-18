@@ -11,56 +11,6 @@ import { ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mix
 import { DirMixin } from '@vaadin/vaadin-element-mixin/vaadin-dir-mixin.js';
 import { FocusablesHelper } from './vaadin-focusables-helper.js';
 
-let overlayContentCounter = 0;
-const overlayContentCache = {};
-
-const createOverlayContent = (cssText) => {
-  const is = overlayContentCache[cssText] || processOverlayStyles(cssText);
-  return document.createElement(is);
-};
-
-const processOverlayStyles = (cssText) => {
-  overlayContentCounter++;
-  const is = `vaadin-overlay-content-${overlayContentCounter}`;
-
-  const styledTemplate = document.createElement('template');
-  const style = document.createElement('style');
-  style.textContent = ':host { display: block; }' + cssText;
-  styledTemplate.content.appendChild(style);
-
-  if (window.ShadyCSS) {
-    window.ShadyCSS.prepareTemplate(styledTemplate, is);
-  }
-
-  // NOTE(platosha): Have to use an awkward IIFE returning class here
-  // to prevent this class from showing up in analysis.json & API docs.
-  const klass = (() => /** @private */ class extends HTMLElement {
-    static get is() {
-      return is;
-    }
-
-    constructor() {
-      super();
-
-      if (!this.shadowRoot) {
-        this.attachShadow({mode: 'open'});
-        this.shadowRoot.appendChild(document.importNode(styledTemplate.content, true));
-      }
-    }
-
-    connectedCallback() {
-      if (window.ShadyCSS) {
-        window.ShadyCSS.styleElement(this);
-      }
-    }
-  })();
-
-  customElements.define(klass.is, klass);
-
-  overlayContentCache[cssText] = is;
-  return is;
-};
-
 /**
  *
  * `<vaadin-overlay>` is a Web Component for creating overlays. The content of the overlay
@@ -867,11 +817,8 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
     this._contentNodes = Array.from(this._instance.root.childNodes);
 
     const templateRoot = template._templateRoot || (template._templateRoot = template.getRootNode());
-    const _isScoped = templateRoot !== document;
 
-    if (_isScoped) {
-      const isShady = window.ShadyCSS && !window.ShadyCSS.nativeShadow;
-
+    if (templateRoot !== document) {
       if (!this.$.content.shadowRoot) {
         this.$.content.attachShadow({mode: 'open'});
       }
@@ -879,39 +826,15 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
       let scopeCssText = Array.from(templateRoot.querySelectorAll('style'))
         .reduce((result, style) => result + style.textContent, '');
 
-      if (isShady) {
-        // NOTE(platosha): ShadyCSS removes <style>’s from templates, so
-        // we have to use these protected APIs to get their contents back
-        const styleInfo = window.ShadyCSS.ScopingShim
-          ._styleInfoForNode(templateRoot.host);
-        if (styleInfo) {
-          scopeCssText += styleInfo._getStyleRules().parsedCssText;
-          scopeCssText += '}';
-        }
-      }
-
       // The overlay root’s :host styles should not apply inside the overlay
       scopeCssText = scopeCssText.replace(/:host/g, ':host-nomatch');
 
       if (scopeCssText) {
-        if (isShady) {
-          // ShadyDOM: replace the <div part="content"> with a generated
-          // styled custom element
-          const contentPart = createOverlayContent(scopeCssText);
-          contentPart.id = 'content';
-          contentPart.setAttribute('part', 'content');
-          this.$.content.parentNode.replaceChild(contentPart, this.$.content);
-          // NOTE(platosha): carry the style scope of the content part
-          contentPart.className = this.$.content.className;
-          this._originalContentPart = this.$.content;
-          this.$.content = contentPart;
-        } else {
-          // Shadow DOM: append a style to the content shadowRoot
-          const style = document.createElement('style');
-          style.textContent = scopeCssText;
-          this.$.content.shadowRoot.appendChild(style);
-          this._contentNodes.unshift(style);
-        }
+        // Append a style to the content shadowRoot
+        const style = document.createElement('style');
+        style.textContent = scopeCssText;
+        this.$.content.shadowRoot.appendChild(style);
+        this._contentNodes.unshift(style);
       }
 
       this.$.content.shadowRoot.appendChild(this._instance.root);
