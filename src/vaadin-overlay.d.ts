@@ -3,7 +3,7 @@ import { ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mix
 import { DirMixin } from '@vaadin/vaadin-element-mixin/vaadin-dir-mixin.js';
 
 
-import { OverlayRenderer } from './interfaces';
+import { OverlayEventMap, OverlayRenderer } from './interfaces';
 
 
 /**
@@ -222,6 +222,18 @@ declare class OverlayElement extends ThemableMixin(DirMixin(HTMLElement)) {
    * Brings the overlay as visually the frontmost one
    */
   bringToFront(): void;
+
+  addEventListener<K extends keyof OverlayEventMap>(
+    type: K,
+    listener: (this: OverlayElement, ev: OverlayEventMap[K]) => void,
+    options?: boolean | AddEventListenerOptions
+  ): void;
+
+  removeEventListener<K extends keyof OverlayEventMap>(
+    type: K,
+    listener: (this: OverlayElement, ev: OverlayEventMap[K]) => void,
+    options?: boolean | EventListenerOptions
+  ): void;
 }
 
 declare global {
