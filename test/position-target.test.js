@@ -1,80 +1,25 @@
-<!doctype html>
-
-<head>
-  <meta charset="UTF-8">
-  <title>vaadin-overlay tests</title>
-  <script src="../../../wct-browser-legacy/browser.js"></script>
-  <script src="../../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
-  <script type="module" src="../../../@polymer/test-fixture/test-fixture.js"></script>
-  <script type="module" src="../vaadin-overlay.js"></script>
-  <script type="module" src="../src/vaadin-overlay-position-mixin.js"></script>
-</head>
-
-<body>
-
-  <style>
-    #target {
-      position: fixed;
-      top: 100px;
-      left: 100px;
-      width: 20px;
-      height: 20px;
-      border: 1px solid;
-    }
-
-    #overlay-child {
-      width: 50px;
-      height: 50px;
-    }
-  </style>
-
-  <script type="module">
-import '@polymer/test-fixture/test-fixture.js';
-import '../vaadin-overlay.js';
+import { expect } from '@esm-bundle/chai';
+import sinon from 'sinon';
+import { fixtureSync } from '@open-wc/testing-helpers';
 import { _PositionMixin } from '../src/vaadin-overlay-position-mixin.js';
 import { OverlayElement } from '../src/vaadin-overlay.js';
-const importsReady = () => {
-  return new Promise(resolve => {
-    if (window.HTMLImports && window.HTMLImports.whenReady) {
-      window.HTMLImports.whenReady(resolve);
-    } else {
-      customElements.whenDefined('vaadin-overlay').then(resolve);
-    }
-  });
-};
-
-importsReady().then(() => {
-  class PositionedOverlay extends _PositionMixin(OverlayElement) {
-    static get is() {
-      return 'vaadin-positioned-overlay';
-    }
-  }
-
-  customElements.define(PositionedOverlay.is, PositionedOverlay);
-});
-</script>
-
-  <test-fixture id="default">
-    <template>
-      <div id="parent">
-        <div id="target">target</div>
-        <vaadin-positioned-overlay id="overlay">
-          <template>
-            <div id="overlay-child"></div>
-          </template>
-        </vaadin-positioned-overlay>
-      </div>
-    </template>
-  </test-fixture>
-
-  <script type="module">
-import '@polymer/test-fixture/test-fixture.js';
 import '../vaadin-overlay.js';
-import '../src/vaadin-overlay-position-mixin.js';
-describe('position target', () => {
 
-  const TOP = 'top', BOTTOM = 'bottom';
-  const START = 'start', END = 'end', LEFT = 'left', RIGHT = 'right';
+class PositionedOverlay extends _PositionMixin(OverlayElement) {
+  static get is() {
+    return 'vaadin-positioned-overlay';
+  }
+}
+
+customElements.define(PositionedOverlay.is, PositionedOverlay);
+
+describe('position target', () => {
+  const TOP = 'top';
+  const BOTTOM = 'bottom';
+  const START = 'start';
+  const END = 'end';
+  const LEFT = 'left';
+  const RIGHT = 'right';
 
   let target, overlay, overlayContent;
   let margin;
@@ -87,20 +32,29 @@ describe('position target', () => {
   }
 
   function expectEdgesAligned(overlayEdge, targetEdge) {
-    expect(overlayContent.getBoundingClientRect()[overlayEdge])
-      .to.be.closeTo(target.getBoundingClientRect()[targetEdge], 1);
+    expect(overlayContent.getBoundingClientRect()[overlayEdge]).to.be.closeTo(
+      target.getBoundingClientRect()[targetEdge],
+      1
+    );
   }
 
   function setRTL() {
     overlay.setAttribute('dir', 'rtl');
   }
 
-  before(done => {
-    customElements.whenDefined('vaadin-positioned-overlay').then(done);
-  });
-
   beforeEach(() => {
-    const parent = fixture('default');
+    const parent = fixtureSync(`
+      <div id="parent">
+        <div id="target" style="position: fixed; top: 100px; left: 100px; width: 20px; height: 20px; border: 1px solid">
+          target
+        </div>
+        <vaadin-positioned-overlay id="overlay">
+          <template>
+            <div id="overlay-child" style="width: 50px; height: 50px;"></div>
+          </template>
+        </vaadin-positioned-overlay>
+      </div>
+    `);
     target = parent.querySelector('#target');
     overlay = parent.querySelector('#overlay');
     overlayContent = overlay.$.overlay;
@@ -130,8 +84,7 @@ describe('position target', () => {
     expectEdgesAligned(LEFT, LEFT);
   });
 
-  const events = ['scroll', 'resize'];
-  events.forEach(event => {
+  ['scroll', 'resize'].forEach((event) => {
     it(`should update position on ${event}`, () => {
       target.style.top = '5px';
       target.style.left = '10px';
@@ -144,17 +97,15 @@ describe('position target', () => {
   it('should remove listeners on close', () => {
     const spy = sinon.spy(window, 'removeEventListener');
     overlay.opened = false;
-    events.forEach(event =>
-      expect(spy.calledWith(event)).to.be.true);
+    expect(spy.calledWith('scroll')).to.be.true;
+    expect(spy.calledWith('resize')).to.be.true;
   });
 
   describe('vertical align top', () => {
-
     beforeEach(() => {
       overlay.verticalAlign = TOP;
       margin = parseInt(getComputedStyle(overlay).bottom, 10);
-      targetPositionToFlipOverlay = document.documentElement.clientHeight
-        - overlayContent.clientHeight - margin;
+      targetPositionToFlipOverlay = document.documentElement.clientHeight - overlayContent.clientHeight - margin;
       targetPositionForCentering = document.documentElement.clientHeight / 2 - target.clientHeight / 2;
     });
 
@@ -199,11 +150,10 @@ describe('position target', () => {
     });
 
     describe('no overlap', () => {
-
       beforeEach(() => {
         overlay.noVerticalOverlap = true;
-        targetPositionToFlipOverlay = document.documentElement.clientHeight
-          - overlayContent.clientHeight - margin - target.clientHeight;
+        targetPositionToFlipOverlay =
+          document.documentElement.clientHeight - overlayContent.clientHeight - margin - target.clientHeight;
       });
 
       it('should align below the target', () => {
@@ -235,12 +185,10 @@ describe('position target', () => {
         updatePosition();
         expectEdgesAligned(BOTTOM, TOP);
       });
-
     });
   });
 
   describe('vertical align bottom', () => {
-
     beforeEach(() => {
       overlay.verticalAlign = BOTTOM;
       margin = parseInt(getComputedStyle(overlay).top, 10);
@@ -263,7 +211,8 @@ describe('position target', () => {
 
       // Move overlay a bit further, which causes it to squeeze smaller than its current available space.
       // This may happen in certain window resize scenarios.
-      overlay.style.bottom = document.documentElement.clientHeight - targetPositionToFlipOverlay - target.clientHeight + 6 + 'px';
+      overlay.style.bottom =
+        document.documentElement.clientHeight - targetPositionToFlipOverlay - target.clientHeight + 6 + 'px';
       updatePosition();
       expectEdgesAligned(TOP, TOP);
     });
@@ -289,7 +238,6 @@ describe('position target', () => {
     });
 
     describe('no overlap', () => {
-
       beforeEach(() => {
         overlay.noVerticalOverlap = true;
         targetPositionToFlipOverlay = margin + overlayContent.clientHeight;
@@ -324,17 +272,14 @@ describe('position target', () => {
         updatePosition();
         expectEdgesAligned(TOP, BOTTOM);
       });
-
     });
   });
 
   describe('horizontal align start', () => {
-
     beforeEach(() => {
       overlay.horizontalAlign = START;
       margin = parseInt(getComputedStyle(overlay).right, 10);
-      targetPositionToFlipOverlay = document.documentElement.clientWidth
-        - overlayContent.clientWidth - margin;
+      targetPositionToFlipOverlay = document.documentElement.clientWidth - overlayContent.clientWidth - margin;
       targetPositionForCentering = document.documentElement.clientWidth / 2 - target.clientWidth / 2;
     });
 
@@ -343,7 +288,7 @@ describe('position target', () => {
     });
 
     it('should align right edges with right-to-left', () => {
-      setRTL();
+      overlay.setAttribute('dir', 'rtl');
       updatePosition();
       expectEdgesAligned(RIGHT, RIGHT);
     });
@@ -385,11 +330,10 @@ describe('position target', () => {
     });
 
     describe('no overlap', () => {
-
       beforeEach(() => {
         overlay.noHorizontalOverlap = true;
-        targetPositionToFlipOverlay = document.documentElement.clientWidth
-          - overlayContent.clientWidth - margin - target.clientWidth;
+        targetPositionToFlipOverlay =
+          document.documentElement.clientWidth - overlayContent.clientWidth - margin - target.clientWidth;
       });
 
       it('should align on the right side of the target', () => {
@@ -421,12 +365,10 @@ describe('position target', () => {
         updatePosition();
         expectEdgesAligned(RIGHT, LEFT);
       });
-
     });
   });
 
   describe('horizontal align end', () => {
-
     beforeEach(() => {
       overlay.horizontalAlign = END;
       margin = parseInt(getComputedStyle(overlay).left, 10);
@@ -455,7 +397,8 @@ describe('position target', () => {
 
       // Move overlay a bit further, which causes it to squeeze smaller than its current available space.
       // This may happen in certain window resize scenarios.
-      overlay.style.right = document.documentElement.clientWidth - targetPositionToFlipOverlay - target.clientWidth + 6 + 'px';
+      overlay.style.right =
+        document.documentElement.clientWidth - targetPositionToFlipOverlay - target.clientWidth + 6 + 'px';
       updatePosition();
       expectEdgesAligned(LEFT, LEFT);
     });
@@ -481,7 +424,6 @@ describe('position target', () => {
     });
 
     describe('no overlap', () => {
-
       beforeEach(() => {
         overlay.noHorizontalOverlap = true;
         targetPositionToFlipOverlay = margin + overlayContent.clientWidth;
@@ -516,9 +458,6 @@ describe('position target', () => {
         updatePosition();
         expectEdgesAligned(LEFT, RIGHT);
       });
-
     });
   });
 });
-</script>
-</body>

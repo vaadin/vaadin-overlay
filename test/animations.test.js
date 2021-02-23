@@ -1,77 +1,44 @@
-<!doctype html>
-
-<head>
-  <meta charset="UTF-8">
-  <title>vaadin-overlay tests</title>
-  <script src="../../../wct-browser-legacy/browser.js"></script>
-  <script src="../../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
-  <script type="module" src="../../../@polymer/test-fixture/test-fixture.js"></script>
-  <script type="module" src="../../../@polymer/iron-test-helpers/mock-interactions.js"></script>
-  <script type="module" src="../../../@polymer/polymer/lib/utils/async.js"></script>
-  <script type="module" src="../../../@polymer/polymer/lib/utils/debounce.js"></script>
-  <script type="module" src="../vaadin-overlay.js"></script>
-</head>
-
-<body>
-  <dom-module id="overlay-test-styles" theme-for="vaadin-overlay">
-    <template>
-      <style>
-        :host([animate][opening]),
-        :host([animate][closing]) {
-          animation: 50ms overlay-dummy-animation;
-        }
-
-        @keyframes overlay-dummy-animation {
-          to {
-            opacity: 1 !important; /* stylelint-disable-line keyframe-declaration-no-important */
-          }
-        }
-      </style>
-    </template>
-  </dom-module>
-
-  <test-fixture id="default">
-    <template>
-      <vaadin-overlay>
-        <template>
-          overlay-content
-        </template>
-      </vaadin-overlay>
-    </template>
-  </test-fixture>
-
-  <test-fixture id="switching">
-    <template>
-      <two-overlays></two-overlays>
-    </template>
-  </test-fixture>
-
-  <dom-module id="two-overlays">
-    <template>
-      <vaadin-overlay opened="{{showOverlay1}}">
-        <template>
-          <div>Overlay 1</div>
-          <button on-click="_switchOverlays">Go to overlay 2</button>
-        </template>
-      </vaadin-overlay>
-      <vaadin-overlay opened="{{showOverlay2}}">
-        <template>
-          <div>Overlay 2</div>
-        </template>
-      </vaadin-overlay>
-    </template>
-
-    <script type="module">
-import '@polymer/test-fixture/test-fixture.js';
-import '@polymer/iron-test-helpers/mock-interactions.js';
-import '@polymer/polymer/lib/utils/async.js';
-import '@polymer/polymer/lib/utils/debounce.js';
+import { expect } from '@esm-bundle/chai';
+import { fixtureSync } from '@open-wc/testing-helpers';
+import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
+import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
+import { registerStyles, css } from '@vaadin/vaadin-themable-mixin/register-styles.js';
+import { escKeyDown } from './helpers.js';
 import '../vaadin-overlay.js';
-import { PolymerElement } from '@polymer/polymer/polymer-element.js';
-customElements.whenDefined('vaadin-overlay').then(() => {
-  class TwoOverlays extends PolymerElement {
-    static get is() {
-      return 'two-overlays';
+
+registerStyles(
+  'vaadin-overlay',
+  css`
+    :host([animate][opening]),
+    :host([animate][closing]) {
+      animation: 50ms overlay-dummy-animation;
+    }
+
+    @keyframes overlay-dummy-animation {
+      to {
+        opacity: 1 !important; /* stylelint-disable-line keyframe-declaration-no-important */
+      }
+    }
+  `
+);
+
+customElements.define(
+  'two-overlays',
+  class extends PolymerElement {
+    static get template() {
+      return html`
+        <vaadin-overlay opened="{{showOverlay1}}">
+          <template>
+            <div>Overlay 1</div>
+            <button on-click="_switchOverlays">Go to overlay 2</button>
+          </template>
+        </vaadin-overlay>
+        <vaadin-overlay opened="{{showOverlay2}}">
+          <template>
+            <div>Overlay 2</div>
+          </template>
+        </vaadin-overlay>
+      `;
     }
 
     static get properties() {
@@ -86,71 +53,30 @@ customElements.whenDefined('vaadin-overlay').then(() => {
       this.showOverlay2 = true;
     }
   }
+);
 
-  customElements.define(TwoOverlays.is, TwoOverlays);
-});
-</script>
-  </dom-module>
-
-  <test-fixture id="content-animation">
-    <template>
-      <div>
-        <vaadin-overlay>
-          <template>
-            <div>Plain old content</div>
-          </template>
-        </vaadin-overlay>
-        <vaadin-overlay>
-          <template>
-            <animated-div>Fancy content</animated-div>
-          </template>
-        </vaadin-overlay>
-      </div>
-    </template>
-  </test-fixture>
-
-  <dom-module id="animated-div">
-    <template>
-      <style>
-        :host {
-          animation: 1ms div-dummy-animation;
-        }
-
-        @keyframes div-dummy-animation {
-          to {
-            opacity: 1 !important; /* stylelint-disable-line keyframe-declaration-no-important */
+customElements.define(
+  'animated-div',
+  class extends PolymerElement {
+    static get template() {
+      return html`
+        <style>
+          :host {
+            animation: 1ms div-dummy-animation;
           }
-        }
-      </style>
-      <slot></slot>
-    </template>
 
-    <script type="module">
-import '@polymer/test-fixture/test-fixture.js';
-import '@polymer/iron-test-helpers/mock-interactions.js';
-import '@polymer/polymer/lib/utils/async.js';
-import '@polymer/polymer/lib/utils/debounce.js';
-import '../vaadin-overlay.js';
-import { PolymerElement } from '@polymer/polymer/polymer-element.js';
-customElements.whenDefined('vaadin-overlay').then(() => {
-  class AnimatedDiv extends PolymerElement {
-    static get is() {
-      return 'animated-div';
+          @keyframes div-dummy-animation {
+            to {
+              opacity: 1 !important; /* stylelint-disable-line keyframe-declaration-no-important */
+            }
+          }
+        </style>
+        <slot></slot>
+      `;
     }
   }
+);
 
-  customElements.define(AnimatedDiv.is, AnimatedDiv);
-});
-</script>
-  </dom-module>
-
-  <script type="module">
-import '@polymer/test-fixture/test-fixture.js';
-import '@polymer/iron-test-helpers/mock-interactions.js';
-import '@polymer/polymer/lib/utils/async.js';
-import '@polymer/polymer/lib/utils/debounce.js';
-import '../vaadin-overlay.js';
-import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
 function afterOverlayOpeningFinished(overlay, callback) {
   const observer = new MutationObserver((mutations, observer) => {
     for (let i = 0; i < mutations.length; i++) {
@@ -166,7 +92,7 @@ function afterOverlayOpeningFinished(overlay, callback) {
       }
     }
   });
-  observer.observe(overlay, {attributes: true, attributeFilter: ['opening']});
+  observer.observe(overlay, { attributes: true, attributeFilter: ['opening'] });
 }
 
 function afterOverlayClosingFinished(overlay, callback) {
@@ -184,17 +110,23 @@ function afterOverlayClosingFinished(overlay, callback) {
       }
     }
   });
-  observer.observe(overlay, {attributes: true, attributeFilter: ['closing']});
+  observer.observe(overlay, { attributes: true, attributeFilter: ['closing'] });
 }
 
-[false, true].forEach(withAnimation => {
+[false, true].forEach((withAnimation) => {
   const titleSuffix = withAnimation ? ' (animated)' : '';
 
   describe(`animated overlay${titleSuffix}`, () => {
     let overlay;
 
     beforeEach(() => {
-      overlay = fixture('default');
+      overlay = fixtureSync(`
+        <vaadin-overlay>
+          <template>
+            overlay-content
+          </template>
+        </vaadin-overlay>
+      `);
       if (withAnimation) {
         overlay.setAttribute('animate', '');
       }
@@ -247,7 +179,7 @@ function afterOverlayClosingFinished(overlay, callback) {
 
     it('should close the overlay when ESC pressed while opening', () => {
       overlay.opened = true;
-      MockInteractions.pressAndReleaseKeyOn(document.body, 27, [], 'Escape');
+      escKeyDown(document.body);
       expect(overlay.opened).to.equal(false);
     });
   });
@@ -255,17 +187,23 @@ function afterOverlayClosingFinished(overlay, callback) {
   describe(`switching two overlays${titleSuffix}`, () => {
     let wrapper, overlays;
 
-    beforeEach(done => {
-      wrapper = fixture('switching');
+    beforeEach((done) => {
+      wrapper = fixtureSync('<two-overlays><two-overlays>');
       overlays = Array.from(wrapper.shadowRoot.querySelectorAll('vaadin-overlay'));
       if (withAnimation) {
-        overlays.forEach(overlay => overlay.setAttribute('animate', ''));
+        overlays.forEach((overlay) => overlay.setAttribute('animate', ''));
       }
       afterOverlayOpeningFinished(overlays[0], done);
       overlays[0].opened = true;
     });
 
-    it('should remove pointer events on previously opened overlay', done => {
+    afterEach(() => {
+      overlays.forEach((overlay) => {
+        overlay.opened = false;
+      });
+    });
+
+    it('should remove pointer events on previously opened overlay', (done) => {
       afterOverlayClosingFinished(overlays[0], () => {
         expect(overlays[0].$.overlay.style.pointerEvents).to.equal('');
         done();
@@ -278,14 +216,20 @@ function afterOverlayClosingFinished(overlay, callback) {
     let wrapper, overlays;
 
     beforeEach(() => {
-      wrapper = fixture('switching');
+      wrapper = fixtureSync('<two-overlays><two-overlays>');
       overlays = Array.from(wrapper.shadowRoot.querySelectorAll('vaadin-overlay'));
       if (withAnimation) {
-        overlays.forEach(overlay => overlay.setAttribute('animate', ''));
+        overlays.forEach((overlay) => overlay.setAttribute('animate', ''));
       }
     });
 
-    it('should not remove pointer events on last opened overlay', done => {
+    afterEach(() => {
+      overlays.forEach((overlay) => {
+        overlay.opened = false;
+      });
+    });
+
+    it('should not remove pointer events on last opened overlay', (done) => {
       afterOverlayOpeningFinished(overlays[1], () => {
         expect(overlays[0].$.overlay.style.pointerEvents).to.equal('none');
         expect(overlays[1].$.overlay.style.pointerEvents).to.equal('');
@@ -300,17 +244,23 @@ function afterOverlayClosingFinished(overlay, callback) {
     let wrapper, overlays;
 
     beforeEach(() => {
-      wrapper = fixture('switching');
+      wrapper = fixtureSync('<two-overlays><two-overlays>');
       const third = document.createElement('vaadin-overlay');
       wrapper.shadowRoot.appendChild(third);
       overlays = Array.from(wrapper.shadowRoot.querySelectorAll('vaadin-overlay'));
 
       if (withAnimation) {
-        overlays.forEach(overlay => overlay.setAttribute('animate', ''));
+        overlays.forEach((overlay) => overlay.setAttribute('animate', ''));
       }
     });
 
-    it('should restore pointer events on the remaining overlay', done => {
+    afterEach(() => {
+      overlays.forEach((overlay) => {
+        overlay.opened = false;
+      });
+    });
+
+    it('should restore pointer events on the remaining overlay', (done) => {
       afterOverlayOpeningFinished(overlays[2], () => {
         expect(overlays[0].$.overlay.style.pointerEvents).to.equal('none');
         overlays[1].opened = false;
@@ -328,14 +278,35 @@ function afterOverlayClosingFinished(overlay, callback) {
     let wrapper, overlays;
 
     beforeEach(() => {
-      wrapper = fixture('content-animation');
+      wrapper = fixtureSync(`
+        <div>
+          <vaadin-overlay>
+            <template>
+              <div>Plain old content</div>
+            </template>
+          </vaadin-overlay>
+          <vaadin-overlay>
+            <template>
+              <animated-div>Fancy content</animated-div>
+            </template>
+          </vaadin-overlay>
+        </div>
+      `);
       overlays = Array.from(wrapper.querySelectorAll('vaadin-overlay'));
       if (withAnimation) {
-        overlays.forEach(overlay => overlay.setAttribute('animate', ''));
+        overlays.forEach((overlay) => {
+          overlay.setAttribute('animate', '');
+        });
       }
     });
 
-    it('should not remove pointer events on last opened overlay', done => {
+    afterEach(() => {
+      overlays.forEach((overlay) => {
+        overlay.opened = false;
+      });
+    });
+
+    it('should not remove pointer events on last opened overlay', (done) => {
       afterOverlayOpeningFinished(overlays[1], () => {
         expect(overlays[0].$.overlay.style.pointerEvents).to.equal('none');
         expect(overlays[1].$.overlay.style.pointerEvents).to.equal('');
@@ -346,5 +317,3 @@ function afterOverlayClosingFinished(overlay, callback) {
     });
   });
 });
-</script>
-</body>

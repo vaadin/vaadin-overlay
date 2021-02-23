@@ -362,6 +362,7 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
     // Listener for preventing closing of the paper-dialog and all components extending `iron-overlay-behavior`.
     this._boundIronOverlayCanceledListener = this._ironOverlayCanceled.bind(this);
 
+    /* c8 ignore next 3 */
     if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
       this._boundIosResizeListener = () => this._detectIosNavbar();
     }
@@ -382,6 +383,7 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
 
   /** @private */
   _detectIosNavbar() {
+    /* c8 ignore next 15 */
     if (!this.opened) {
       return;
     }
@@ -424,6 +426,7 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
   connectedCallback() {
     super.connectedCallback();
 
+    /* c8 ignore next 3 */
     if (this._boundIosResizeListener) {
       this._detectIosNavbar();
       window.addEventListener('resize', this._boundIosResizeListener);
@@ -433,7 +436,10 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
   disconnectedCallback() {
     super.disconnectedCallback();
 
-    this._boundIosResizeListener && window.removeEventListener('resize', this._boundIosResizeListener);
+    /* c8 ignore next 3 */
+    if (this._boundIosResizeListener) {
+      window.removeEventListener('resize', this._boundIosResizeListener);
+    }
   }
 
   /** @private */

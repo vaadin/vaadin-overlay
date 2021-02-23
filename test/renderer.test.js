@@ -1,54 +1,30 @@
-<!doctype html>
-
-<head>
-  <meta charset="UTF-8">
-  <title>vaadin-overlay tests</title>
-  <script src="../../../wct-browser-legacy/browser.js"></script>
-  <script src="../../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
-  <script type="module" src="../../../@polymer/test-fixture/test-fixture.js"></script>
-  <script type="module" src="../../../@polymer/iron-test-helpers/iron-test-helpers.js"></script>
-  <script type="module" src="../vaadin-overlay.js"></script>
-</head>
-
-<body>
-
-  <test-fixture id="default">
-    <template>
-      <vaadin-overlay></vaadin-overlay>
-    </template>
-  </test-fixture>
-
-  <test-fixture id="with-template">
-    <template>
-      <vaadin-overlay>
-        <template>
-          overlay-content
-        </template>
-      </vaadin-overlay>
-    </template>
-  </test-fixture>
-
-  <script type="module">
-import '@polymer/test-fixture/test-fixture.js';
-import '@polymer/iron-test-helpers/iron-test-helpers.js';
+import { expect } from '@esm-bundle/chai';
+import sinon from 'sinon';
+import { fixtureSync } from '@open-wc/testing-helpers';
 import '../vaadin-overlay.js';
+
 describe('renderer', () => {
   let rendererContent, renderModel;
 
-  beforeEach(function() {
+  beforeEach(() => {
     rendererContent = document.createElement('p');
-    rendererContent.innerText = 'renderer-content';
-    renderModel = {selected: true};
+    rendererContent.textContent = 'renderer-content';
+    renderModel = { selected: true };
   });
 
-  describe('without template', () => {
+  describe('without overlay', () => {
     let overlay;
 
-    beforeEach(() => overlay = fixture('default'));
-    afterEach(() => overlay.opened = false);
+    beforeEach(() => {
+      overlay = fixtureSync('<vaadin-overlay></vaadin-overlay>');
+    });
+
+    afterEach(() => {
+      overlay.opened = false;
+    });
 
     it('should use renderer when it is defined', () => {
-      overlay.renderer = root => root.appendChild(rendererContent);
+      overlay.renderer = (root) => root.appendChild(rendererContent);
       overlay.opened = true;
       expect(overlay.textContent.trim()).to.equal('renderer-content');
     });
@@ -65,10 +41,10 @@ describe('renderer', () => {
     });
 
     it('should clean the root on renderer changed', () => {
-      overlay.renderer = root => root.appendChild(rendererContent);
+      overlay.renderer = (root) => root.appendChild(rendererContent);
       overlay.opened = true;
       expect(overlay.textContent.trim()).to.equal('renderer-content');
-      overlay.renderer = root => expect(root.firstChild).to.be.null;
+      overlay.renderer = (root) => expect(root.firstChild).to.be.null;
     });
 
     it('should not clean the root on model or owner changed', () => {
@@ -86,7 +62,7 @@ describe('renderer', () => {
     it('should pass owner as this to the renderer', () => {
       overlay.owner = {};
       overlay.model = renderModel;
-      overlay.renderer = function(root, owner, model) {
+      overlay.renderer = function (root, owner, model) {
         expect(this).to.eql(owner);
       };
     });
@@ -95,25 +71,25 @@ describe('renderer', () => {
       const spy = sinon.spy();
       overlay.opened = true;
       overlay.renderer = () => spy();
-      spy.reset();
+      spy.resetHistory();
       overlay.instanceProps = {};
-      expect(spy.notCalled).to.be.true;
+      expect(spy.called).to.be.false;
     });
 
     it('should not call renderer on template change', () => {
       const spy = sinon.spy();
       overlay.opened = true;
       overlay.renderer = () => spy();
-      spy.reset();
+      spy.resetHistory();
       overlay.template = null;
-      expect(spy.notCalled).to.be.true;
+      expect(spy.called).to.be.false;
     });
 
     it('should call renderer on model change', () => {
       const spy = sinon.spy();
       overlay.opened = true;
       overlay.renderer = () => spy();
-      spy.reset();
+      spy.resetHistory();
       overlay.model = {};
       expect(spy.calledOnce).to.be.true;
     });
@@ -122,7 +98,7 @@ describe('renderer', () => {
       const spy = sinon.spy();
       overlay.opened = true;
       overlay.renderer = () => spy();
-      spy.reset();
+      spy.resetHistory();
       overlay.owner = {};
       expect(spy.calledOnce).to.be.true;
     });
@@ -130,7 +106,7 @@ describe('renderer', () => {
     it('should remove template when added after renderer', () => {
       overlay.renderer = () => {};
       const template = document.createElement('template');
-      expect(() => overlay.template = template).to.throw(Error);
+      expect(() => (overlay.template = template)).to.throw(Error);
       expect(overlay.template).to.be.not.ok;
     });
 
@@ -143,22 +119,33 @@ describe('renderer', () => {
     it('should not render if overlay is not open', () => {
       const spy = sinon.spy();
       overlay.renderer = () => spy();
-      expect(spy.notCalled).to.be.true;
+      expect(spy.called).to.be.false;
     });
   });
 
   describe('with template', () => {
     let overlay;
 
-    beforeEach(() => overlay = fixture('with-template'));
-    afterEach(() => overlay.opened = false);
+    beforeEach(() => {
+      overlay = fixtureSync(`
+        <vaadin-overlay>
+          <template>
+            overlay-content
+          </template>
+        </vaadin-overlay>
+      `);
+    });
+
+    afterEach(() => {
+      overlay.opened = false;
+    });
 
     it('should fallback to render content with Templatizer when renderer is not defined', () => {
       expect(overlay.textContent.trim()).to.equal('overlay-content');
     });
 
     it('should throw an error when setting a renderer if there is already a template', () => {
-      expect(() => overlay.renderer = () => {}).to.throw(Error);
+      expect(() => (overlay.renderer = () => {})).to.throw(Error);
     });
 
     it('should restamp the template on instanceProps change', () => {
@@ -182,12 +169,8 @@ describe('renderer', () => {
     });
 
     it('should remove renderer when added after template', () => {
-      expect(() => overlay.renderer = () => {}).to.throw(Error);
+      expect(() => (overlay.renderer = () => {})).to.throw(Error);
       expect(overlay.renderer).to.be.not.ok;
     });
   });
 });
-</script>
-</body>
-
-
