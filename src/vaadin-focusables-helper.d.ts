@@ -5,7 +5,6 @@
  * See https://github.com/PolymerElements/iron-overlay-behavior/issues/282
  */
 declare class FocusablesHelper {
-
   /**
    * Returns a sorted array of tabbable nodes, including the root node.
    * It searches the tabbable nodes in the light and shadow dom of the children,
@@ -25,4 +24,4 @@ declare class FocusablesHelper {
   static isTabbable(element: HTMLElement): boolean;
 }
 
-export {FocusablesHelper};
+export { FocusablesHelper };

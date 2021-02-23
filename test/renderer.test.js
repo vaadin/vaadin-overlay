@@ -62,7 +62,7 @@ describe('renderer', () => {
     it('should pass owner as this to the renderer', () => {
       overlay.owner = {};
       overlay.model = renderModel;
-      overlay.renderer = function (root, owner, model) {
+      overlay.renderer = function (root, owner) {
         expect(this).to.eql(owner);
       };
     });

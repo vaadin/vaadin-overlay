@@ -11,7 +11,6 @@
  * See https://github.com/PolymerElements/iron-overlay-behavior/issues/282
  */
 class FocusablesHelper {
-
   /**
    * Returns a sorted array of tabbable nodes, including the root node.
    * It searches the tabbable nodes in the light and shadow dom of the children,
@@ -61,9 +60,7 @@ class FocusablesHelper {
    * @return {boolean}
    */
   static isTabbable(element) {
-    return this.isFocusable(element) &&
-        element.matches(':not([tabindex="-1"])') &&
-        this._isVisible(element);
+    return this.isFocusable(element) && element.matches(':not([tabindex="-1"])') && this._isVisible(element);
   }
 
   /**
@@ -117,7 +114,7 @@ class FocusablesHelper {
     //  </div>
     let children;
     if (element.localName === 'slot') {
-      children = element.assignedNodes({flatten: true});
+      children = element.assignedNodes({ flatten: true });
     } else {
       // Use shadow root if possible, will check for distributed nodes.
       children = (element.shadowRoot || element).children;
@@ -143,7 +140,7 @@ class FocusablesHelper {
     let style = element.style;
     if (style.visibility !== 'hidden' && style.display !== 'none') {
       style = window.getComputedStyle(element);
-      return (style.visibility !== 'hidden' && style.display !== 'none');
+      return style.visibility !== 'hidden' && style.display !== 'none';
     }
     return false;
   }
@@ -176,7 +173,7 @@ class FocusablesHelper {
    */
   static _mergeSortByTabIndex(left, right) {
     const result = [];
-    while ((left.length > 0) && (right.length > 0)) {
+    while (left.length > 0 && right.length > 0) {
       if (this._hasLowerTabOrder(left[0], right[0])) {
         result.push(right.shift());
       } else {
@@ -203,7 +200,7 @@ class FocusablesHelper {
     // e.g. in Firefox `<div contenteditable>` has `tabIndex = -1`
     const ati = Math.max(a.tabIndex, 0);
     const bti = Math.max(b.tabIndex, 0);
-    return (ati === 0 || bti === 0) ? bti > ati : ati > bti;
+    return ati === 0 || bti === 0 ? bti > ati : ati > bti;
   }
 }
 

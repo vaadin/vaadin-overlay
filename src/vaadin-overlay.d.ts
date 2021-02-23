@@ -1,6 +1,6 @@
-import {ThemableMixin} from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
+import { ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
 
-import {DirMixin} from '@vaadin/vaadin-element-mixin/vaadin-dir-mixin.js';
+import { DirMixin } from '@vaadin/vaadin-element-mixin/vaadin-dir-mixin.js';
 
 /**
  * `<vaadin-overlay>` is a Web Component for creating overlays. The content of the overlay
@@ -92,7 +92,6 @@ import {DirMixin} from '@vaadin/vaadin-element-mixin/vaadin-dir-mixin.js';
  * See [ThemableMixin – how to apply styles for shadow parts](https://github.com/vaadin/vaadin-themable-mixin/wiki)
  */
 declare class OverlayElement extends ThemableMixin(DirMixin(HTMLElement)) {
-
   /**
    * returns true if this is the last one in the opened overlays stack
    */
@@ -101,12 +100,12 @@ declare class OverlayElement extends ThemableMixin(DirMixin(HTMLElement)) {
   /**
    * When true, the overlay is visible and attached to body.
    */
-  opened: boolean|null|undefined;
+  opened: boolean | null | undefined;
 
   /**
    * Owner element passed with renderer function
    */
-  owner: HTMLElement|null;
+  owner: HTMLElement | null;
 
   /**
    * Custom function for rendering the content of the overlay.
@@ -116,22 +115,22 @@ declare class OverlayElement extends ThemableMixin(DirMixin(HTMLElement)) {
    * - `owner` The host element of the renderer function.
    * - `model` The object with the properties related with rendering.
    */
-  renderer: OverlayRenderer|null|undefined;
+  renderer: OverlayRenderer | null | undefined;
 
   /**
    * The template of the overlay content.
    */
-  template: HTMLTemplateElement|null|undefined;
+  template: HTMLTemplateElement | null | undefined;
 
   /**
    * Optional argument for `Polymer.Templatize.templatize`.
    */
-  instanceProps: object|null|undefined;
+  instanceProps: object | null | undefined;
 
   /**
    * References the content container after the template is stamped.
    */
-  content: HTMLElement|undefined;
+  content: HTMLElement | undefined;
 
   /**
    * When true the overlay has backdrop on top of content when opened.
@@ -141,7 +140,7 @@ declare class OverlayElement extends ThemableMixin(DirMixin(HTMLElement)) {
   /**
    * Object with properties that is passed to `renderer` function
    */
-  model: object|null|undefined;
+  model: object | null | undefined;
 
   /**
    * When true the overlay won't disable the main content, showing
@@ -168,13 +167,13 @@ declare class OverlayElement extends ThemableMixin(DirMixin(HTMLElement)) {
 
   _setTemplateFromNodes(nodes: Element[]): void;
 
-  close(sourceEvent?: Event|null): void;
+  close(sourceEvent?: Event | null): void;
 
   _ensureTemplatized(): void;
 
   _shouldAnimate(): boolean;
 
-  _enqueueAnimation(type: string, callback: Function|null): void;
+  _enqueueAnimation(type: string, callback: Function | null): void;
 
   _flushAnimation(type: string): void;
 
@@ -196,18 +195,18 @@ declare class OverlayElement extends ThemableMixin(DirMixin(HTMLElement)) {
 
   _removeOldContent(): void;
 
-  _stampOverlayTemplate(template: HTMLTemplateElement, instanceProps: object|null): void;
+  _stampOverlayTemplate(template: HTMLTemplateElement, instanceProps: object | null): void;
 
   /**
    * Manually invoke existing renderer.
    */
   render(): void;
 
-  _isFocused(element: Element|null): boolean;
+  _isFocused(element: Element | null): boolean;
 
-  _focusedIndex(elements: Array<Element|null>|null): number;
+  _focusedIndex(elements: Array<Element | null> | null): number;
 
-  _cycleTab(increment: number, index: number|undefined): void;
+  _cycleTab(increment: number, index: number | undefined): void;
 
   _getFocusableElements(): HTMLElement[];
 
@@ -222,12 +221,11 @@ declare class OverlayElement extends ThemableMixin(DirMixin(HTMLElement)) {
 }
 
 declare global {
-
   interface HTMLElementTagNameMap {
-    "vaadin-overlay": OverlayElement;
+    'vaadin-overlay': OverlayElement;
   }
 }
 
-export {OverlayElement};
+export { OverlayElement };
 
-import {OverlayRenderer} from '../@types/interfaces';
+import { OverlayRenderer } from '../@types/interfaces';

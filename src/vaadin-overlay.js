@@ -108,82 +108,78 @@ import { FocusablesHelper } from './vaadin-focusables-helper.js';
 class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
   static get template() {
     return html`
-    <style>
-      :host {
-        z-index: 200;
-        position: fixed;
+      <style>
+        :host {
+          z-index: 200;
+          position: fixed;
 
-        /*
-          Despite of what the names say, <vaadin-overlay> is just a container
-          for position/sizing/alignment. The actual overlay is the overlay part.
-        */
+          /* Despite of what the names say, <vaadin-overlay> is just a container
+          for position/sizing/alignment. The actual overlay is the overlay part. */
 
-        /*
-          Default position constraints: the entire viewport. Note: themes can
-          override this to introduce gaps between the overlay and the viewport.
-        */
-        top: 0;
-        right: 0;
-        bottom: var(--vaadin-overlay-viewport-bottom);
-        left: 0;
+          /* Default position constraints: the entire viewport. Note: themes can
+          override this to introduce gaps between the overlay and the viewport. */
+          top: 0;
+          right: 0;
+          bottom: var(--vaadin-overlay-viewport-bottom);
+          left: 0;
 
-        /* Use flexbox alignment for the overlay part. */
-        display: flex;
-        flex-direction: column; /* makes dropdowns sizing easier */
-        /* Align to center by default. */
-        align-items: center;
-        justify-content: center;
+          /* Use flexbox alignment for the overlay part. */
+          display: flex;
+          flex-direction: column; /* makes dropdowns sizing easier */
+          /* Align to center by default. */
+          align-items: center;
+          justify-content: center;
 
-        /* Allow centering when max-width/max-height applies. */
-        margin: auto;
+          /* Allow centering when max-width/max-height applies. */
+          margin: auto;
 
-        /* The host is not clickable, only the overlay part is. */
-        pointer-events: none;
+          /* The host is not clickable, only the overlay part is. */
+          pointer-events: none;
 
-        /* Remove tap highlight on touch devices. */
-        -webkit-tap-highlight-color: transparent;
+          /* Remove tap highlight on touch devices. */
+          -webkit-tap-highlight-color: transparent;
 
-        /* CSS API for host */
-        --vaadin-overlay-viewport-bottom: 0;
-      }
+          /* CSS API for host */
+          --vaadin-overlay-viewport-bottom: 0;
+        }
 
-      :host([hidden]),
-      :host(:not([opened]):not([closing])) {
-        display: none !important;
-      }
+        :host([hidden]),
+        :host(:not([opened]):not([closing])) {
+          display: none !important;
+        }
 
-      [part="overlay"] {
-        -webkit-overflow-scrolling: touch;
-        overflow: auto;
-        pointer-events: auto;
+        [part='overlay'] {
+          -webkit-overflow-scrolling: touch;
+          overflow: auto;
+          pointer-events: auto;
 
-        /* Prevent overflowing the host in MSIE 11 */
-        max-width: 100%;
-        box-sizing: border-box;
+          /* Prevent overflowing the host in MSIE 11 */
+          max-width: 100%;
+          box-sizing: border-box;
 
-        -webkit-tap-highlight-color: initial; /* reenable tap highlight inside */
-      }
+          -webkit-tap-highlight-color: initial; /* reenable tap highlight inside */
+        }
 
-      [part="backdrop"] {
-        z-index: -1;
-        content: "";
-        background: rgba(0, 0, 0, 0.5);
-        position: fixed;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        pointer-events: auto;
-      }
-    </style>
+        [part='backdrop'] {
+          z-index: -1;
+          content: '';
+          background: rgba(0, 0, 0, 0.5);
+          position: fixed;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          right: 0;
+          pointer-events: auto;
+        }
+      </style>
 
-    <div id="backdrop" part="backdrop" hidden\$="{{!withBackdrop}}"></div>
-    <div part="overlay" id="overlay" tabindex="0">
-      <div part="content" id="content">
-        <slot></slot>
+      <div id="backdrop" part="backdrop" hidden$="{{!withBackdrop}}"></div>
+      <div part="overlay" id="overlay" tabindex="0">
+        <div part="content" id="content">
+          <slot></slot>
+        </div>
       </div>
-    </div>
-`;
+    `;
   }
 
   static get is() {
@@ -298,7 +294,7 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
        */
       restoreFocusOnClose: {
         type: Boolean,
-        value: false,
+        value: false
       },
 
       /** @private */
@@ -343,9 +339,7 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
   }
 
   static get observers() {
-    return [
-      '_templateOrRendererChanged(template, renderer, owner, model, instanceProps, opened)'
-    ];
+    return ['_templateOrRendererChanged(template, renderer, owner, model, instanceProps, opened)'];
   }
 
   constructor() {
@@ -355,7 +349,7 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
     this._boundOutsideClickListener = this._outsideClickListener.bind(this);
     this._boundKeydownListener = this._keydownListener.bind(this);
 
-    this._observer = new FlattenedNodesObserver(this, info => {
+    this._observer = new FlattenedNodesObserver(this, (info) => {
       this._setTemplateFromNodes(info.addedNodes);
     });
 
@@ -407,7 +401,7 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
    * @protected
    */
   _setTemplateFromNodes(nodes) {
-    this.template = nodes.filter(node => node.localName && node.localName === 'template')[0] || this.template;
+    this.template = nodes.filter((node) => node.localName && node.localName === 'template')[0] || this.template;
   }
 
   /**
@@ -416,7 +410,11 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
    * fired before the `vaadin-overlay` will be closed. If canceled the closing of the overlay is canceled as well.
    */
   close(sourceEvent) {
-    var evt = new CustomEvent('vaadin-overlay-close', {bubbles: true, cancelable: true, detail: {sourceEvent: sourceEvent}});
+    var evt = new CustomEvent('vaadin-overlay-close', {
+      bubbles: true,
+      cancelable: true,
+      detail: { sourceEvent: sourceEvent }
+    });
     this.dispatchEvent(evt);
     if (!evt.defaultPrevented) {
       this.opened = false;
@@ -468,8 +466,7 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
    * @private
    */
   _outsideClickListener(event) {
-    if (event.composedPath().indexOf(this.$.overlay) !== -1 ||
-        this._mouseDownInside || this._mouseUpInside) {
+    if (event.composedPath().indexOf(this.$.overlay) !== -1 || this._mouseDownInside || this._mouseUpInside) {
       this._mouseDownInside = false;
       this._mouseUpInside = false;
       return;
@@ -478,7 +475,11 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
       return;
     }
 
-    const evt = new CustomEvent('vaadin-overlay-outside-click', {bubbles: true, cancelable: true, detail: {sourceEvent: event}});
+    const evt = new CustomEvent('vaadin-overlay-outside-click', {
+      bubbles: true,
+      cancelable: true,
+      detail: { sourceEvent: event }
+    });
     this.dispatchEvent(evt);
 
     if (this.opened && !evt.defaultPrevented) {
@@ -504,9 +505,13 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
 
       event.preventDefault();
 
-    // ESC
+      // ESC
     } else if (event.key === 'Escape' || event.key === 'Esc') {
-      const evt = new CustomEvent('vaadin-overlay-escape-press', {bubbles: true, cancelable: true, detail: {sourceEvent: event}});
+      const evt = new CustomEvent('vaadin-overlay-escape-press', {
+        bubbles: true,
+        cancelable: true,
+        detail: { sourceEvent: event }
+      });
       this.dispatchEvent(evt);
 
       if (this.opened && !evt.defaultPrevented) {
@@ -541,7 +546,7 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
           this._cycleTab(0, 0);
         }
 
-        const evt = new CustomEvent('vaadin-overlay-open', {bubbles: true});
+        const evt = new CustomEvent('vaadin-overlay-open', { bubbles: true });
         this.dispatchEvent(evt);
       });
 
@@ -581,7 +586,7 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
    */
   _enqueueAnimation(type, callback) {
     const handler = `__${type}Handler`;
-    const listener = event => {
+    const listener = (event) => {
       if (event && event.target !== this) {
         return;
       }
@@ -687,8 +692,8 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
    */
   static get __attachedInstances() {
     return Array.from(document.body.children)
-      .filter(el => el instanceof OverlayElement && !el.hasAttribute('closing'))
-      .sort((a, b) => (a.__zIndex - b.__zIndex) || 0);
+      .filter((el) => el instanceof OverlayElement && !el.hasAttribute('closing'))
+      .sort((a, b) => a.__zIndex - b.__zIndex || 0);
   }
 
   /**
@@ -733,7 +738,7 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
     }
 
     // Disable pointer events in other attached overlays
-    OverlayElement.__attachedInstances.forEach(el => {
+    OverlayElement.__attachedInstances.forEach((el) => {
       if (el !== this) {
         el.shadowRoot.querySelector('[part="overlay"]').style.pointerEvents = 'none';
       }
@@ -760,7 +765,7 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
     const instances = OverlayElement.__attachedInstances;
     let el;
     // Use instances.pop() to ensure the reverse order
-    while (el = instances.pop()) {
+    while ((el = instances.pop())) {
       if (el === this) {
         // Skip the current instance
         continue;
@@ -781,7 +786,7 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
 
     this._observer.disconnect();
 
-    this._contentNodes.forEach(node => {
+    this._contentNodes.forEach((node) => {
       if (node.parentNode === this.content) {
         this.content.removeChild(node);
       }
@@ -811,7 +816,7 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
     if (!template._Templatizer) {
       template._Templatizer = templatize(template, this, {
         instanceProps: instanceProps,
-        forwardHostProp: function(prop, value) {
+        forwardHostProp: function (prop, value) {
           if (this._instance) {
             this._instance.forwardHostProp(prop, value);
           }
@@ -826,11 +831,13 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
 
     if (templateRoot !== document) {
       if (!this.$.content.shadowRoot) {
-        this.$.content.attachShadow({mode: 'open'});
+        this.$.content.attachShadow({ mode: 'open' });
       }
 
-      let scopeCssText = Array.from(templateRoot.querySelectorAll('style'))
-        .reduce((result, style) => result + style.textContent, '');
+      let scopeCssText = Array.from(templateRoot.querySelectorAll('style')).reduce(
+        (result, style) => result + style.textContent,
+        ''
+      );
 
       // The overlay root’s :host styles should not apply inside the overlay
       scopeCssText = scopeCssText.replace(/:host/g, ':host-nomatch');
@@ -876,11 +883,11 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
       throw new Error('You should only use either a renderer or a template for overlay content');
     }
 
-    const ownerOrModelChanged = (this._oldOwner !== owner || this._oldModel !== model);
+    const ownerOrModelChanged = this._oldOwner !== owner || this._oldModel !== model;
     this._oldModel = model;
     this._oldOwner = owner;
 
-    const templateOrInstancePropsChanged = (this._oldInstanceProps !== instanceProps || this._oldTemplate !== template);
+    const templateOrInstancePropsChanged = this._oldInstanceProps !== instanceProps || this._oldTemplate !== template;
     this._oldInstanceProps = instanceProps;
     this._oldTemplate = template;
 
@@ -943,7 +950,7 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
     // rollover to first item
     if (index >= focusableElements.length) {
       index = 0;
-    // go to last item
+      // go to last item
     } else if (index < 0) {
       index = focusableElements.length - 1;
     }
@@ -1003,7 +1010,7 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
    */
   bringToFront() {
     let zIndex = '';
-    const frontmost = OverlayElement.__attachedInstances.filter(o => o !== this).pop();
+    const frontmost = OverlayElement.__attachedInstances.filter((o) => o !== this).pop();
     if (frontmost) {
       const frontmostZIndex = frontmost.__zIndex;
       zIndex = frontmostZIndex + 1;
