@@ -14,10 +14,10 @@ const config = {
   coverageConfig: {
     include: ['**/src/*'],
     threshold: {
-      statements: 98,
+      statements: 99,
       branches: 66,
       functions: 97,
-      lines: 98
+      lines: 99
     }
   },
   // Ignore overlay position mixin warnings

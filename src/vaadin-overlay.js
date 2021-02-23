@@ -977,15 +977,9 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
    * @protected
    */
   _getActiveElement() {
-    let active = document.activeElement;
     // document.activeElement can be null
     // https://developer.mozilla.org/en-US/docs/Web/API/Document/activeElement
-    // In IE 11, it can also be an object when operating in iframes
-    // or document.documentElement (when overlay closed on outside click).
-    // In these cases, default it to document.body.
-    if (!active || active === document.documentElement || active instanceof Element === false) {
-      active = document.body;
-    }
+    let active = document.activeElement || document.body;
     while (active.shadowRoot && active.shadowRoot.activeElement) {
       active = active.shadowRoot.activeElement;
     }
