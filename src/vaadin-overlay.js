@@ -362,6 +362,7 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
     }
   }
 
+  /** @protected */
   ready() {
     super.ready();
 
@@ -421,6 +422,7 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
     }
   }
 
+  /** @protected */
   connectedCallback() {
     super.connectedCallback();
 
@@ -431,6 +433,7 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
     }
   }
 
+  /** @protected */
   disconnectedCallback() {
     super.disconnectedCallback();
 
