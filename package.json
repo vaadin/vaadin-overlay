@@ -28,6 +28,7 @@
   ],
   "scripts": {
     "debug": "web-test-runner test/*.test.js --watch",
+    "start": "web-dev-server --node-resolve --open",
     "test": "web-test-runner test/*.test.js --coverage",
     "test:sauce": "TEST_ENV=sauce npm test"
   },
@@ -47,6 +48,7 @@
     "@vaadin/vaadin-button": "^2.1.0",
     "@vaadin/vaadin-radio-button": "^1.5.1",
     "@vaadin/vaadin-text-field": "^3.0.1",
+    "@web/dev-server": "^0.1.8",
     "@web/test-runner": "^0.12.7",
     "@web/test-runner-saucelabs": "^0.4.1",
     "sinon": "^9.2.1"
