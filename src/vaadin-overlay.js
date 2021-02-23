@@ -175,7 +175,7 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
         }
       </style>
 
-      <div id="backdrop" part="backdrop" hidden$="{{!withBackdrop}}"></div>
+      <div id="backdrop" part="backdrop" hidden$="[[!withBackdrop]]"></div>
       <div part="overlay" id="overlay" tabindex="0">
         <div part="content" id="content">
           <slot></slot>
