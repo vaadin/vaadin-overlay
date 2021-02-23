@@ -2,6 +2,10 @@ import { ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mix
 
 import { DirMixin } from '@vaadin/vaadin-element-mixin/vaadin-dir-mixin.js';
 
+
+import { OverlayRenderer } from './interfaces';
+
+
 /**
  * `<vaadin-overlay>` is a Web Component for creating overlays. The content of the overlay
  * can be populated in two ways: imperatively by using renderer callback function and
@@ -227,5 +231,3 @@ declare global {
 }
 
 export { OverlayElement };
-
-import { OverlayRenderer } from '../@types/interfaces';

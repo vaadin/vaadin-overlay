@@ -22,7 +22,6 @@
   "files": [
     "vaadin-*.d.ts",
     "vaadin-*.js",
-    "@types",
     "src",
     "theme"
   ],
