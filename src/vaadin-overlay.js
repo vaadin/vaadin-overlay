@@ -537,7 +537,7 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
       this._animatedOpening();
 
       afterNextRender(this, () => {
-        if (this.focusTrap && !this.contains(document._activeElement || document.activeElement)) {
+        if (this.focusTrap && !this.contains(document.activeElement)) {
           this._cycleTab(0, 0);
         }
 
@@ -965,7 +965,7 @@ class OverlayElement extends ThemableMixin(DirMixin(PolymerElement)) {
    * @protected
    */
   _getActiveElement() {
-    let active = document._activeElement || document.activeElement;
+    let active = document.activeElement;
     // document.activeElement can be null
     // https://developer.mozilla.org/en-US/docs/Web/API/Document/activeElement
     // In IE 11, it can also be an object when operating in iframes
