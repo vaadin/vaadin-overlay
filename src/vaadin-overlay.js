@@ -101,6 +101,8 @@ import { FocusablesHelper } from './vaadin-focusables-helper.js';
  *
  * See [ThemableMixin – how to apply styles for shadow parts](https://github.com/vaadin/vaadin-themable-mixin/wiki)
  *
+ * @fires {CustomEvent} opened-changed - Fired when the `opened` property changes.
+ *
  * @extends HTMLElement
  * @mixes ThemableMixin
  * @mixes DirMixin
