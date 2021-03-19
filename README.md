@@ -3,6 +3,12 @@
 
 # &lt;vaadin-overlay&gt;
 
+> ⚠️ 　Starting from Vaadin 20, this project has migrated to [`vaadin-web-components`](https://github.com/vaadin/vaadin-web-components/tree/master/packages/vaadin-overlay) *monorepository*.
+>
+> This repository is used for Vaadin 14 LTS and Vaadin 19.
+
+---
+
 &lt;vaadin-overlay&gt; is a Web Component meant for internal use in Vaadin components.
 
 
