@@ -89,7 +89,7 @@
       }
 
       before(done => {
-        customElements.whenDefined('vaadin-positioned-overlay').then(done);
+        customElements.whenDefined('vaadin-positioned-overlay').then(() => done());
       });
 
       beforeEach(() => {
