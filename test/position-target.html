@@ -172,7 +172,7 @@
         });
 
         // TODO: fails on Google Android emulator
-        const android = /android/i.test(navigator.userAgent)
+        const android = /android/i.test(navigator.userAgent);
         (android ? it.skip : it)('should flip back to default when it fits again', () => {
           target.style.top = targetPositionToFlipOverlay + 3 + 'px';
           updatePosition();
